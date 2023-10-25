@@ -1,4 +1,5 @@
-import { AppDataSource } from "./data-source";
+import "dotenv/config";
+import AppDataSource from "./data-source";
 import express, {
   Express,
   NextFunction,
@@ -7,7 +8,6 @@ import express, {
   json,
   urlencoded,
 } from "express";
-import "dotenv/config";
 import cors from "cors";
 import cookieparser from "cookie-parser";
 
@@ -15,6 +15,7 @@ import parentRouter from "./routes/parents.route";
 import studentRouter from "./routes/students.route";
 import authRouter from "./routes/auth.route";
 import AppError from "./utils/appError";
+import redisClient from "./utils/connectRedis";
 
 AppDataSource.initialize()
   .then(async () => {
@@ -31,8 +32,13 @@ AppDataSource.initialize()
     app.use("/api/students", studentRouter);
     app.use("/api/auth", authRouter);
 
-    app.get("/", (req: Request, res: Response) => {
-      res.send("Wecode Backend");
+    app.get("/api/healthChecker", async (_, res: Response) => {
+      const message = await redisClient.get("try");
+
+      res.status(200).json({
+        status: "success",
+        message,
+      });
     });
 
     app.all("*", (req: Request, res: Response, next: NextFunction) => {

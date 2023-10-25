@@ -1,19 +1,23 @@
-import express from 'express'
-import { deleteParent, getParents } from '../controllers/parents.controller'
-import { validate } from '../middlewares/validate'
+import express from "express";
+import {
+  deleteParentHandler,
+  getParentHandler,
+  getParentsHandler,
+} from "../controllers/parents.controller";
+import { validate } from "../middlewares/validate";
 import {
   deleteParentSchema,
   getParentSchema,
   updateParentSchema,
-} from '../schemas/parents.schema'
+} from "../schemas/parents.schema";
 
-const router = express.Router()
+const router = express.Router();
 
-router.route('/').get(getParents)
+router.route("/").get(getParentsHandler);
 router
-  .route('/:id')
-  // .get(validate(getParentSchema), getParent)
+  .route("/:id")
+  .get(validate(getParentSchema), getParentHandler)
   .patch(validate(updateParentSchema))
-  .delete(validate(deleteParentSchema), deleteParent)
+  .delete(validate(deleteParentSchema), deleteParentHandler);
 
-export default router
+export default router;

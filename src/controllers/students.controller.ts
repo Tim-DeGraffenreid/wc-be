@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Student } from "../entity/students.entity";
 import { DeepPartial } from "typeorm";
-import { AppDataSource } from "../data-source";
+import AppDataSource from "../data-source";
 
 const studentRepository = AppDataSource.getRepository(Student);
 

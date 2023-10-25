@@ -1,4 +1,4 @@
-import { TypeOf, ZodEnum, object, string } from "zod";
+import { TypeOf, ZodEnum, nativeEnum, object, string } from "zod";
 
 enum UserType {
   PARENT = "parent",
@@ -13,6 +13,6 @@ export const loginUserSchema = object({
     password: string({
       required_error: "Password is required",
     }).min(8, "Invalid email or password"),
-    userType: string({}),
+    userType: nativeEnum(UserType),
   }),
 });
