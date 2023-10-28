@@ -1,6 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/appError";
-import { findParentById, getParents } from "../services/parents.service";
+import {
+  createNewStudent,
+  findParentById,
+  getParents,
+  getStudents,
+} from "../services/parents.service";
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -83,6 +88,47 @@ export const deleteParentHandler = async (
     res.status(204).json({
       status: "success",
       data: null,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addStudentsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { userType, ...parentInfo } = res.locals.user;
+  // if (userType !== "parent") {
+  //   return next(new AppError(401, "Unauthorized"));
+  // }
+
+  try {
+    const student = await createNewStudent(req.body, parentInfo);
+
+    res.status(201).json({
+      status: "success",
+      data: student,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getStudentsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = res.locals.user;
+
+  try {
+    const students = await getStudents(id);
+
+    res.status(200).json({
+      status: "success",
+      students,
     });
   } catch (error) {
     next(error);

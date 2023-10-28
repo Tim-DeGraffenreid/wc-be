@@ -11,6 +11,8 @@ import { loginUserSchema } from "../schemas/auth.schema";
 
 const router = express.Router();
 
+
+// 
 router.route("/register/parent").post(validate(parentSchema), registerParent);
 router.route("/login").post(validate(loginUserSchema), login);
 router
@@ -18,5 +20,7 @@ router
   .post(validate(studentSchema), registerStudent);
 router.route("/me").get();
 router.route("/refresh").get();
+
+// 
 
 export default router;

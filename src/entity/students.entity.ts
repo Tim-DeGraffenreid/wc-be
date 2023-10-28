@@ -1,69 +1,82 @@
-import { BeforeInsert, Column, Entity, Index, ManyToOne, OneToMany } from 'typeorm'
-import { Parent } from './parents.entity'
-import { Knowledge } from './knowledge.entity'
-import Model from './base.entity'
-import bcrypt from 'bcrypt'
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+} from "typeorm";
+import { Parent } from "./parents.entity";
+import { Knowledge } from "./knowledge.entity";
+import Model from "./base.entity";
+import bcrypt from "bcrypt";
 
 export enum GenderEnum {
-  MALE = 'male',
-  FEMALE = 'female'
+  MALE = "male",
+  FEMALE = "female",
 }
 
 @Entity()
 export class Student extends Model {
   @ManyToOne(() => Parent)
-  parent: Parent
+  parent: Parent;
 
-  @Index('student_email_index')
+  @Index("student_email_index")
   @Column({ unique: true })
-  email: string
+  email: string;
 
   @Column({ select: false })
-  password: string
+  password: string;
 
   @Column()
-  fName: string
+  fName: string;
 
   @Column()
-  lName: string
+  lName: string;
+
+  @Column({ nullable: true })
+  phoneNumber: string;
+
+  @Column("date")
+  birthday: Date;
 
   @Column()
-  phoneNumber: string
-
-  @Column('date')
-  birthday: Date
+  grade: string;
 
   @Column()
-  grade: string
+  schoolName: string;
+
+  @Column({ type: "enum", enum: GenderEnum })
+  gender: string;
 
   @Column()
-  schoolName: string
+  zipCode: string;
 
-  @Column({ type: 'enum', enum: GenderEnum })
-  gender: string
-
-  @Column()
-  zipCode: string
+  // TODO: add username column
+  // TODO: forgot password functionality
 
   @OneToMany(() => Knowledge, (knowledge) => knowledge.student)
-  knowledge: Knowledge
+  knowledge: Knowledge;
 
   toJSON() {
-    return { ...this, password: undefined }
+    return { ...this, password: undefined };
   }
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 12)
+    this.password = await bcrypt.hash(this.password, 12);
   }
 
   @BeforeInsert()
   handleBirthDate() {
-    this.birthday = new Date(this.birthday)
+    this.birthday = new Date(this.birthday);
   }
 
   // ? Validate password
-  static async comparePasswords(candidatePassword: string, hashedPassword: string) {
-    return await bcrypt.compare(candidatePassword, hashedPassword)
+  static async comparePasswords(
+    candidatePassword: string,
+    hashedPassword: string
+  ) {
+    return await bcrypt.compare(candidatePassword, hashedPassword);
   }
 }

@@ -48,14 +48,12 @@ export const deserializeUser = async (
 
     const user = await userRepository.findOneBy({ id: JSON.parse(session).id });
 
-    console.log(user);
-
     if (!user) {
       return next(new AppError(401, `Invalid token or session has expired`));
     }
 
     // Add user to res.locals
-    res.locals.user = user;
+    res.locals.user = { ...user, userType };
 
     next();
   } catch (err: any) {
