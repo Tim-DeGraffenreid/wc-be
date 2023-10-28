@@ -22,14 +22,6 @@ const accessTokenCookieOptions: CookieOptions = {
   maxAge: process.env.ACCESS_TOKEN_EXPIRES_IN * 60 * 1000,
 };
 
-const refreshTokenCookieOptions: CookieOptions = {
-  ...cookiesOptions,
-  expires: new Date(
-    Date.now() + process.env.REFRESH_TOKEN_EXPIRES_IN * 60 * 1000
-  ),
-  maxAge: process.env.REFRESH_TOKEN_EXPIRES_IN * 60 * 1000,
-};
-
 export const registerParent = async (
   req: Request,
   res: Response,
@@ -38,10 +30,9 @@ export const registerParent = async (
   try {
     const parent = await createParent({ ...req.body });
 
-    const { access_token, refresh_token } = await signTokens(parent);
+    const { access_token } = await signTokens(parent);
 
     res.cookie("access_token", access_token, accessTokenCookieOptions);
-    res.cookie("refresh_token", refresh_token, refreshTokenCookieOptions);
     res.cookie("user_type", "parent", {
       ...accessTokenCookieOptions,
       httpOnly: false,
@@ -76,8 +67,21 @@ export const registerStudent = async (
   try {
     const student = await createStudent({ ...req.body });
 
+    const { access_token } = await signTokens(student);
+
+    res.cookie("access_token", access_token, accessTokenCookieOptions);
+    res.cookie("user_type", "student", {
+      ...accessTokenCookieOptions,
+      httpOnly: false,
+    });
+    res.cookie("logged_in", true, {
+      ...accessTokenCookieOptions,
+      httpOnly: false,
+    });
+
     res.status(201).json({
       status: "success",
+      access_token,
       data: {
         student,
       },
@@ -111,10 +115,9 @@ export const login = async (
     }
 
     //
-    const { access_token, refresh_token } = await signTokens(user);
+    const { access_token } = await signTokens(user);
 
     res.cookie("access_token", access_token, accessTokenCookieOptions);
-    res.cookie("refresh_token", refresh_token, refreshTokenCookieOptions);
     res.cookie("user_type", userType, {
       ...accessTokenCookieOptions,
       httpOnly: false,

@@ -1,6 +1,5 @@
 import jwt, { SignOptions } from "jsonwebtoken";
 
-// ? Sign Access or Refresh Token
 export const signJwt = (payload: Object, options: SignOptions) => {
   const privateKey = process.env.JWT_TOKEN;
   if (privateKey) {
