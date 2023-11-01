@@ -14,6 +14,7 @@ import cookieparser from "cookie-parser";
 import parentRouter from "./routes/parents.route";
 import studentRouter from "./routes/students.route";
 import authRouter from "./routes/auth.route";
+import classRouter from "./routes/class.route";
 import AppError from "./utils/appError";
 import redisClient from "./utils/connectRedis";
 
@@ -28,9 +29,10 @@ AppDataSource.initialize()
     app.use(cookieparser());
 
     // routes
+    app.use("/api/auth", authRouter);
+    app.use("/api/class", classRouter);
     app.use("/api/parents", parentRouter);
     app.use("/api/students", studentRouter);
-    app.use("/api/auth", authRouter);
 
     app.get("/api/healthChecker", async (_, res: Response) => {
       const message = await redisClient.get("try");

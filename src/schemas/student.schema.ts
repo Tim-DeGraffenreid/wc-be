@@ -1,7 +1,6 @@
-import { boolean, nativeEnum, object, string, z } from "zod";
+import { nativeEnum, object, string, z } from "zod";
 import { parentSchema } from "./parents.schema";
 import { GenderEnum } from "../entity/students.entity";
-// import { knowledgeSchema } from './knowledge.schema'
 
 export const studentSchema = object({
   body: object({
@@ -19,9 +18,17 @@ export const studentSchema = object({
     schoolName: string({ required_error: "schoolName is required" }),
     gender: nativeEnum(GenderEnum),
     zipCode: string({ required_error: "zipCode is required" }).regex(/^\d{5}$/),
-    // knowledge: optional(knowledgeSchema),
   }),
 });
+
+export const knowledgeSchema = object({
+  body: object({
+    student: studentSchema,
+    grade: string(),
+    class: string(),
+    skills: string(),
+  }),
+})
 
 const params = {
   params: object({

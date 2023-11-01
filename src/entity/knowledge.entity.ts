@@ -1,18 +1,19 @@
-import { Column, Entity, ManyToOne } from 'typeorm'
-import { Student } from './students.entity'
-import Model from './base.entity'
+import { Column, Entity, ManyToOne } from "typeorm";
+import { Student } from "./students.entity";
+import Model from "./base.entity";
+import { Classes } from "./class.entity";
 
 @Entity()
 export class Knowledge extends Model {
   @ManyToOne(() => Student)
-  student: Student
+  student: Student;
 
   @Column()
-  grade: string
+  grade: string;
+
+  @Column("json")
+  class: Classes;
 
   @Column()
-  language: string
-
-  @Column()
-  skills: string
+  skills: string;
 }
