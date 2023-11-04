@@ -1,7 +1,7 @@
 import { Column, Entity } from "typeorm";
 import Model from "./base.entity";
 
-Entity("class");
+@Entity()
 export class Classes extends Model {
   @Column({ unique: true })
   name: string;

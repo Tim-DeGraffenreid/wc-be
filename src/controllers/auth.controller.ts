@@ -136,3 +136,22 @@ export const login = async (
     next(error);
   }
 };
+
+export const getMeHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userType, ...rest } = res.locals.user;
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        ...rest,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

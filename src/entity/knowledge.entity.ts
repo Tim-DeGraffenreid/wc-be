@@ -8,12 +8,12 @@ export class Knowledge extends Model {
   @ManyToOne(() => Student)
   student: Student;
 
-  @Column()
+  @Column({ nullable: true })
   grade: string;
 
-  @Column("json")
+  @ManyToOne(() => Classes)
   class: Classes;
 
-  @Column()
+  @Column({ nullable: true })
   skills: string;
 }

@@ -11,7 +11,7 @@ export const signTokens = async (user: Parent | Student) => {
   const access_token = signJwt(
     { sub: user.id },
     {
-      expiresIn: `${process.env.ACCESS_TOKEN_EXPIRES_IN}m`,
+      expiresIn: `${process.env.ACCESS_TOKEN_EXPIRES_IN}d`,
     }
   );
 

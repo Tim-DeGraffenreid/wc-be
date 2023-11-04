@@ -1,11 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../utils/appError";
 import {
+  addChildToClass,
+  addDemographic,
   createNewStudent,
   findParentById,
+  getParentChild,
   getParents,
   getStudents,
 } from "../services/parents.service";
+import { findClassById } from "../services/class.service";
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -129,6 +133,79 @@ export const getStudentsHandler = async (
     res.status(200).json({
       status: "success",
       students,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateParentsHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const parent = await findParentById(id);
+
+    if (!parent) {
+      return next(new AppError(404, "Parent with id does not exist"));
+    }
+
+    Object.assign(parent, req.body);
+    await parent.save();
+
+    res.status(200).json({
+      status: "success",
+      data: parent,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addDemographicHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = res.locals.user;
+
+    const updatedData = await addDemographic(id, req.body);
+
+    res.status(201).json({
+      status: "success",
+      data: {
+        parent: updatedData,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const addChildToClassHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = res.locals.user;
+    const { studentId, classId } = req.params;
+
+    const student = await getParentChild(id, studentId);
+    const getClass = await findClassById(classId);
+
+    if (!student || !getClass) {
+      return res.status(404).json({ error: "Student or class not found" });
+    }
+
+    await addChildToClass(student, getClass);
+
+    res.status(201).json({
+      status: "success",
+      message: "Student added to class successfully",
     });
   } catch (error) {
     next(error);

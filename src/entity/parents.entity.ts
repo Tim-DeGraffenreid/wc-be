@@ -6,68 +6,71 @@ import {
   JoinColumn,
   OneToMany,
   OneToOne,
-} from 'typeorm'
-import { Student } from './students.entity'
-import { DemographicInfo } from './demographic.entity'
-import Model from './base.entity'
-import bcrypt from 'bcrypt'
+} from "typeorm";
+import { Student } from "./students.entity";
+import { DemographicInfo } from "./demographic.entity";
+import Model from "./base.entity";
+import bcrypt from "bcrypt";
 
 @Entity()
 export class Parent extends Model {
   @Column({ unique: true })
-  @Index('parent_email_index')
-  email: string
+  @Index("parent_email_index")
+  email: string;
 
   @Column()
-  password: string
+  password: string;
 
   @Column()
-  fName: string
+  fName: string;
 
   @Column()
-  lName: string
+  lName: string;
 
   @Column()
-  phoneNumber: string
+  phoneNumber: string;
 
-  @Column('date')
-  birthday: Date
-
-  @Column()
-  educationLevel: string
+  @Column("date")
+  birthday: Date;
 
   @Column()
-  veteranStatus: string
+  educationLevel: string;
 
   @Column()
-  regularTransportation: boolean
+  veteranStatus: string;
 
   @Column()
-  housingStatus: string
+  regularTransportation: boolean;
+
+  @Column()
+  housingStatus: string;
 
   @OneToMany(() => Student, (student) => student.parent)
-  children: Student[]
+  children: Student[];
 
   @JoinColumn()
   @OneToOne(() => DemographicInfo)
-  demographicInfo: DemographicInfo
+  demographicInfo: DemographicInfo;
 
   toJSON() {
-    return { ...this, password: undefined }
+    return { ...this, password: undefined };
   }
 
   @BeforeInsert()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 12)
+    this.password = await bcrypt.hash(this.password, 12);
   }
 
   @BeforeInsert()
   convertDate() {
-    this.birthday = new Date(this.birthday)
+    this.birthday = new Date(this.birthday);
   }
 
   // ? Validate password
-  static async comparePasswords(candidatePassword: string, hashedPassword: string) {
-    return await bcrypt.compare(candidatePassword, hashedPassword)
+  static async comparePasswords(
+    candidatePassword: string,
+    hashedPassword: string
+  ) {
+    return await bcrypt.compare(candidatePassword, hashedPassword);
   }
 }

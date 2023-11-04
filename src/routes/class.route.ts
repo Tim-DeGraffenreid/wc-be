@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  addClassHandler,
   deleteClassHandler,
   getClassByIdHandler,
   getClassesHandler,
@@ -7,6 +8,7 @@ import {
 } from "../controllers/class.controller";
 import { validate } from "../middlewares/validate";
 import {
+  classSchema,
   deleteClassSchema,
   getClassSchema,
   updateClassSchema,
@@ -14,7 +16,10 @@ import {
 
 const router = express.Router();
 
-router.route("/").get(getClassesHandler);
+router
+  .route("/")
+  .get(getClassesHandler)
+  .post(validate(classSchema), addClassHandler);
 router
   .route("/:id")
   .get(validate(getClassSchema), getClassByIdHandler)

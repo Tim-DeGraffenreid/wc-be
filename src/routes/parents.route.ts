@@ -1,14 +1,18 @@
 import express from "express";
 import {
+  addChildToClassHandler,
+  addDemographicHandler,
   addStudentsHandler,
   deleteParentHandler,
   getParentHandler,
   getParentsHandler,
   getStudentsHandler,
+  updateParentsHandler,
 } from "../controllers/parents.controller";
 import { validate } from "../middlewares/validate";
 import {
   deleteParentSchema,
+  demographicInfoSchema,
   getParentSchema,
   updateParentSchema,
 } from "../schemas/parents.schema";
@@ -21,9 +25,17 @@ const router = express.Router();
 router.route("/").get(getParentsHandler);
 router.route("/students").get(deserializeUser, requireUser, getStudentsHandler);
 router
+  .route("/demographic")
+  .post(
+    validate(demographicInfoSchema),
+    deserializeUser,
+    requireUser,
+    addDemographicHandler
+  );
+router
   .route("/:id")
   .get(validate(getParentSchema), getParentHandler)
-  .patch(validate(updateParentSchema))
+  .patch(validate(updateParentSchema), updateParentsHandler)
   .delete(validate(deleteParentSchema), deleteParentHandler);
 router
   .route("/students/new")
@@ -33,5 +45,8 @@ router
     requireUser,
     addStudentsHandler
   );
+router
+  .route("/add-to-class/:studentId/:classId")
+  .post(deserializeUser, requireUser, addChildToClassHandler);
 
 export default router;

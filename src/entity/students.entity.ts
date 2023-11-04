@@ -55,8 +55,11 @@ export class Student extends Model {
   // TODO: add username column
   // TODO: forgot password functionality
 
-  @OneToMany(() => Knowledge, (knowledge) => knowledge.student)
-  knowledge: Knowledge;
+  @OneToMany(() => Knowledge, (knowledge) => knowledge.student, {
+    cascade: true,
+    eager: true,
+  })
+  knowledge: Knowledge[];
 
   toJSON() {
     return { ...this, password: undefined };

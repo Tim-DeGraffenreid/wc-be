@@ -17,6 +17,9 @@ import authRouter from "./routes/auth.route";
 import classRouter from "./routes/class.route";
 import AppError from "./utils/appError";
 import redisClient from "./utils/connectRedis";
+import { Knowledge } from "./entity/knowledge.entity";
+
+const knowledgeRepository = AppDataSource.getRepository(Knowledge);
 
 AppDataSource.initialize()
   .then(async () => {
@@ -33,6 +36,10 @@ AppDataSource.initialize()
     app.use("/api/class", classRouter);
     app.use("/api/parents", parentRouter);
     app.use("/api/students", studentRouter);
+
+    app.delete("/api/knowledge/:id", async (req, res) => {
+      res.send(await knowledgeRepository.delete({ id: req.params.id }));
+    });
 
     app.get("/api/healthChecker", async (_, res: Response) => {
       const message = await redisClient.get("try");
