@@ -3,9 +3,12 @@ import AppDataSource from "../data-source";
 import { Student } from "../entity/students.entity";
 import { Parent } from "../entity/parents.entity";
 import AppError from "../utils/appError";
-import { createParent } from "../services/parents.service";
+import { createParent, findParentByEmail } from "../services/parents.service";
 import { signTokens } from "../services/auth.service";
-import { createStudent } from "../services/students.service";
+import {
+  createStudent,
+  findStudentByDetails,
+} from "../services/students.service";
 
 const cookiesOptions: CookieOptions = {
   httpOnly: true,
@@ -150,6 +153,34 @@ export const getMeHandler = async (
       data: {
         ...rest,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const forgotPasswordHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userType, email, ...rest } = req.body;
+    let results;
+
+    if (userType === "student") {
+      results = await findStudentByDetails(rest);
+    } else if (userType === "parent") {
+      results = await findParentByEmail({ email });
+    }
+
+    if (!results) {
+      return next(new AppError(400, 'Details not found in database'))
+    }
+
+    res.status(201).json({
+      status: "success",
+      results,
     });
   } catch (error) {
     next(error);

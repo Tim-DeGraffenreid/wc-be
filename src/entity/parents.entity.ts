@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeUpdate,
   Column,
   Entity,
   Index,
@@ -57,8 +58,11 @@ export class Parent extends Model {
   }
 
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 12);
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 12);
+    }
   }
 
   @BeforeInsert()

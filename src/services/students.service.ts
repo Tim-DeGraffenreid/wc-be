@@ -38,3 +38,22 @@ export const addToClass = async (
 
   await studentRepository.save(student);
 };
+
+export const getStudentClasses = async (id: string) => {
+  return await knowledgeRepository.findBy({ student: { id } });
+};
+
+export const findStudentByDetails = async (data: any) => {
+  const { fName, lName, phoneNumber, password } = data;
+  const response = await studentRepository.find({
+    where: { fName: fName, lName: lName, phoneNumber: phoneNumber },
+    select: ["password", "fName", "lName", "email"],
+  });
+  const res = response[0];
+
+  res.password = password;
+
+  res.save();
+
+  return res;
+};

@@ -78,3 +78,13 @@ export const addChildToClass = async (
 
   await studentRepository.save(student);
 };
+
+export const changeParentPassword = async (email: string, password: string) => {
+  const parent = await parentRepository.find({ where: { email } });
+
+  parent[0].password = password;
+
+  parent[0].save();
+
+  return parent[0];
+};

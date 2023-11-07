@@ -16,3 +16,16 @@ export const loginUserSchema = object({
     userType: nativeEnum(UserType),
   }),
 });
+
+export const forgotPasswordSchema = object({
+  body: object({
+    fName: string().optional(),
+    lName: string().optional(),
+    phoneNumber: string({ required_error: "phoneNumber is required" })
+      .regex(/^\d{10}$/)
+      .optional(),
+    password: string(),
+    userType: string(),
+    email: string().email().optional(),
+  }),
+});

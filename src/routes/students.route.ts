@@ -3,6 +3,7 @@ import {
   addToClassHandler,
   createStudentHandler,
   deleteStudentHandler,
+  getStudentClassHandler,
   getStudentHandler,
   getStudentsHandler,
   updateStudentHandler,
@@ -18,6 +19,9 @@ router
   .route("/")
   .get(getStudentsHandler)
   .post(validate(studentSchema), createStudentHandler);
+router
+  .route("/classes")
+  .get(deserializeUser, requireUser, getStudentClassHandler);
 router
   .route("/:id")
   .get(getStudentHandler)

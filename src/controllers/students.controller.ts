@@ -5,6 +5,7 @@ import {
   addToClass,
   createStudent,
   findStudentById,
+  getStudentClasses,
   getStudents,
 } from "../services/students.service";
 import AppError from "../utils/appError";
@@ -131,6 +132,24 @@ export const addToClassHandler = async (
     res.status(201).json({
       status: "success",
       message: "Added to class successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getStudentClassHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = res.locals.user;
+    const classes = await getStudentClasses(id);
+
+    res.status(200).json({
+      status: "success",
+      classes,
     });
   } catch (error) {
     next(error);

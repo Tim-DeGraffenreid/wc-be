@@ -11,7 +11,7 @@ export class Knowledge extends Model {
   @Column({ nullable: true })
   grade: string;
 
-  @ManyToOne(() => Classes)
+  @ManyToOne(() => Classes, { eager: true })
   class: Classes;
 
   @Column({ nullable: true })
