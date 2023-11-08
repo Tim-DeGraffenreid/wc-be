@@ -1,4 +1,4 @@
-import { DeepPartial } from "typeorm";
+import { DeepPartial, IsNull, Not } from "typeorm";
 import AppDataSource from "../data-source";
 import { Student } from "../entity/students.entity";
 import { Classes } from "../entity/class.entity";
@@ -45,15 +45,15 @@ export const getStudentClasses = async (id: string) => {
 
 export const findStudentByDetails = async (data: any) => {
   const { fName, lName, phoneNumber, password } = data;
-  const response = await studentRepository.find({
-    where: { fName: fName, lName: lName, phoneNumber: phoneNumber },
-    select: ["password", "fName", "lName", "email"],
+  const response = await studentRepository.findOneBy({
+    fName,
+    lName,
+    phoneNumber,
   });
-  const res = response[0];
 
-  res.password = password;
-
-  res.save();
-
-  return res;
+  if (response) {
+    response.password = password;
+    response.save();
+    return response;
+  }
 };

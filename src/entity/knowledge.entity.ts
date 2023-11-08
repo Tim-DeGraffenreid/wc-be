@@ -5,7 +5,7 @@ import { Classes } from "./class.entity";
 
 @Entity()
 export class Knowledge extends Model {
-  @ManyToOne(() => Student)
+  @ManyToOne(() => Student, { onDelete: "CASCADE" })
   student: Student;
 
   @Column({ nullable: true })

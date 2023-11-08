@@ -175,7 +175,7 @@ export const forgotPasswordHandler = async (
     }
 
     if (!results) {
-      return next(new AppError(400, 'Details not found in database'))
+      return next(new AppError(400, "Details not found"));
     }
 
     res.status(201).json({
