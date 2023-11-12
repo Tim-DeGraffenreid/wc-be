@@ -18,7 +18,7 @@ import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient from './utils/connectRedis'
 import { Knowledge } from './entity/knowledge.entity'
-import { testing_updateStudent } from './services/salesforce.service'
+// import { testing_updateStudent } from './services/salesforce.service'
 
 const knowledgeRepository = AppDataSource.getRepository(Knowledge)
 
@@ -32,7 +32,7 @@ AppDataSource.initialize()
     app.use(urlencoded({ extended: false }))
     app.use(cookieparser())
 
-    console.log(await testing_updateStudent())
+    // console.log(await testing_updateStudent())
 
     // routes
     app.use('/api/auth', authRouter)
@@ -40,11 +40,11 @@ AppDataSource.initialize()
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
 
-    app.delete('/api/knowledge/:id', async (req, res) => {
+    app.delete('/api/knowledge/:id', async (req: Request, res: Response) => {
       res.send(await knowledgeRepository.delete({ id: req.params.id }))
     })
 
-    app.get('/api/healthChecker', async (_, res: Response) => {
+    app.get('/api/healthChecker', async (req: Request, res: Response) => {
       const message = await redisClient.get('try')
 
       res.status(200).json({
