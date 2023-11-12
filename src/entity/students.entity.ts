@@ -1,5 +1,6 @@
 import {
   BeforeInsert,
+  BeforeRemove,
   BeforeUpdate,
   Column,
   Entity,
@@ -19,7 +20,7 @@ export enum GenderEnum {
 
 @Entity()
 export class Student extends Model {
-  @ManyToOne(() => Parent)
+  @ManyToOne(() => Parent, { onDelete: "CASCADE" })
   parent: Parent;
 
   @Index("student_email_index")
@@ -35,7 +36,7 @@ export class Student extends Model {
   @Column()
   lName: string;
 
-  @Column({ nullable: true })
+  @Column()
   phoneNumber: string;
 
   @Column("date")

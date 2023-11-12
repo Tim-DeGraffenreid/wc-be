@@ -80,11 +80,13 @@ export const addChildToClass = async (
 };
 
 export const changeParentPassword = async (email: string, password: string) => {
-  const parent = await parentRepository.find({ where: { email } });
+  const parent = await parentRepository.findOneBy({ email, phoneNumber: '8125200027' });
 
-  parent[0].password = password;
+  if (parent) {
+    parent.password = password;
 
-  parent[0].save();
+    parent.save();
 
-  return parent[0];
+    return parent;
+  }
 };

@@ -13,8 +13,8 @@ export const deserializeUser = async (
 ) => {
   try {
     let access_token;
-    // const userType = req.cookies.user_type;
-    const userType = "student";
+    const userType = req.cookies.user_type;
+    // const userType = "student";
 
     if (
       req.headers.authorization &&
