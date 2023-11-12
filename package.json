@@ -32,8 +32,8 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "build": "npx tsc && npx nodemon -q build/index.js",
+    "start": "node build/index.js",
+    "build": "npx tsc",
     "typeorm": "typeorm-ts-node-commonjs",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/index.js\""
   },
