@@ -18,7 +18,6 @@ import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient from './utils/connectRedis'
 import { Knowledge } from './entity/knowledge.entity'
-// import { testing_updateStudent } from './services/salesforce.service'
 
 const knowledgeRepository = AppDataSource.getRepository(Knowledge)
 
@@ -32,7 +31,6 @@ AppDataSource.initialize()
     app.use(urlencoded({ extended: false }))
     app.use(cookieparser())
 
-    // console.log(await testing_updateStudent())
 
     // routes
     app.use('/api/auth', authRouter)
