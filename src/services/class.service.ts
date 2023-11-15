@@ -1,21 +1,27 @@
-import { DeepPartial } from "typeorm";
-import AppDataSource from "../data-source";
-import { Classes } from "../entity/class.entity";
-
-const classRepository = AppDataSource.getRepository(Classes);
+import { DeepPartial } from 'typeorm'
+import prisma from '../utils/prisma'
+import { classes } from '@prisma/client'
 
 export const getCLasses = async () => {
-  return await classRepository.find();
-};
+  return await prisma.classes.findMany()
+}
 
-export const addClass = async (data: DeepPartial<Classes>) => {
-  return await classRepository.save(classRepository.create(data));
-};
+export const addClass = async (data: classes) => {
+  return await prisma.classes.create({ data })
+}
 
 export const findClassById = async (id: string) => {
-  return await classRepository.findOneBy({ id });
-};
+  return await prisma.classes.findUniqueOrThrow({ where: { id } })
+}
 
 export const findClassByName = async (name: string) => {
-  return await classRepository.findOneBy({ name });
-};
+  return await prisma.classes.findUnique({ where: { name } })
+}
+
+export const updateClass = async (id: string, data: Partial<classes>) => {
+  return await prisma.classes.update({ where: { id }, data })
+}
+
+export const deleteClass = async (id: string) => {
+  return await prisma.classes.delete({ where: { id } })
+}

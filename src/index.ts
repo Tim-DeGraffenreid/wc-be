@@ -1,5 +1,4 @@
 import 'dotenv/config'
-import AppDataSource from './data-source'
 import express, {
   Express,
   NextFunction,
@@ -16,12 +15,9 @@ import studentRouter from './routes/students.route'
 import authRouter from './routes/auth.route'
 import classRouter from './routes/class.route'
 import AppError from './utils/appError'
-import redisClient from './utils/connectRedis'
-import { Knowledge } from './entity/knowledge.entity'
+import redisClient, { connectRedis } from './utils/connectRedis'
 
-const knowledgeRepository = AppDataSource.getRepository(Knowledge)
-
-AppDataSource.initialize()
+connectRedis()
   .then(async () => {
     const app: Express = express()
     const port = process.env.PORT || 5000
@@ -31,16 +27,11 @@ AppDataSource.initialize()
     app.use(urlencoded({ extended: false }))
     app.use(cookieparser())
 
-
     // routes
     app.use('/api/auth', authRouter)
     app.use('/api/class', classRouter)
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
-
-    app.delete('/api/knowledge/:id', async (req: Request, res: Response) => {
-      res.send(await knowledgeRepository.delete({ id: req.params.id }))
-    })
 
     app.get('/api/healthChecker', async (req: Request, res: Response) => {
       const message = await redisClient.get('try')
@@ -69,4 +60,4 @@ AppDataSource.initialize()
       console.log(`⚡[server]: Server started successfully on PORT: ${port}`)
     })
   })
-  .catch((error) => console.log(error))
+  .catch((err: any) => console.log(err))

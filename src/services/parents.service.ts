@@ -1,92 +1,122 @@
-import { DeepPartial } from "typeorm";
-import AppDataSource from "../data-source";
-import { Parent } from "../entity/parents.entity";
-import { Student } from "../entity/students.entity";
-import { DemographicInfo } from "../entity/demographic.entity";
-import { Classes } from "../entity/class.entity";
-import { Knowledge } from "../entity/knowledge.entity";
-
-const parentRepository = AppDataSource.getRepository(Parent);
-const studentRepository = AppDataSource.getRepository(Student);
-const demographicRepository = AppDataSource.getRepository(DemographicInfo);
-const knowledgeRepository = AppDataSource.getRepository(Knowledge);
+import { hashPassword } from '../utils/password.manager'
+import prisma from '../utils/prisma'
+import { demographic_info, parent, student } from '@prisma/client'
 
 export const getParents = async () => {
-  return await parentRepository.find();
-};
+  return await prisma.parent.findMany()
+}
 
-export const createParent = async (data: DeepPartial<Parent>) => {
-  return parentRepository.save(parentRepository.create(data));
-};
+export const createParent = async (data: parent) => {
+  data.password = await hashPassword(data.password)
+  return await prisma.parent.create({ data })
+}
 
 export const findParentByEmail = async ({ email }: { email: string }) => {
-  return await parentRepository.findOneBy({ email });
-};
+  return await prisma.parent.findFirst({ where: { email } })
+}
 
 export const findParentById = async (userId: string) => {
-  return await parentRepository.findOneBy({ id: userId });
-};
+  return await prisma.parent.findUnique({ where: { id: userId } })
+}
 
-export const createNewStudent = async (
-  student: DeepPartial<Student>,
-  parent: DeepPartial<Parent>
-) => {
-  const createdStudent = await studentRepository.save(
-    studentRepository.create({ ...student, parent })
-  );
-  return createdStudent;
-};
+export const createNewStudent = async (studentData: student, parentId: string) => {
+  const student = await prisma.student.create({
+    data: {
+      ...studentData,
+    },
+  })
+
+  await prisma.parent.update({
+    where: { id: parentId },
+    data: {
+      student: {
+        connect: {
+          id: student.id,
+        },
+      },
+    },
+  })
+
+  return student
+}
 
 export const getStudents = async (id: string) => {
-  return await studentRepository.findBy({ parent: { id } });
-};
+  return await prisma.student.findMany({ where: { parent: { id } } })
+}
 
-export const addDemographic = async (
-  id: string,
-  data: DeepPartial<DemographicInfo>
-) => {
-  const parent = await parentRepository.findOneBy({ id });
+export const addDemographic = async (id: string, data: demographic_info) => {
+  const demographic = await prisma.demographic_info.create({
+    data: {
+      ...data,
+    },
+  })
 
-  if (parent) {
-    const demographicInfo = await demographicRepository.save(
-      demographicRepository.create(data)
-    );
-    Object.assign(parent.demographicInfo, demographicInfo);
+  const parent = await prisma.parent.update({
+    where: { id: id },
+    data: {
+      demographic_info: {
+        connect: {
+          id: demographic.id,
+        },
+      },
+    },
+  })
 
-    return parent.save();
-  }
-};
+  return parent
+}
 
 export const getParentChild = async (parentId: string, childId: string) => {
-  return await studentRepository.findOneBy({
-    id: childId,
-    parent: { id: parentId },
-  });
-};
+  return await prisma.student.findFirst({
+    where: { parent: { id: parentId }, id: childId },
+  })
+}
 
-export const addChildToClass = async (
-  student: Student,
-  classes: DeepPartial<Classes>
-) => {
-  const knowledge = await knowledgeRepository.save(
-    knowledgeRepository.create({
-      student,
-      class: classes,
-    })
-  );
-  student.knowledge.push(knowledge);
+export const addChildToClass = async (student: student, classId: string) => {
+  const knowledge = await prisma.knowledge.create({
+    data: {
+      student: {
+        connect: { id: student.id },
+      },
+      classes: {
+        connect: { id: classId },
+      },
+    },
+  })
 
-  await studentRepository.save(student);
-};
+  const updateStudent = await prisma.student.update({
+    where: { id: student.id },
+    data: {
+      knowledge: {
+        connect: { id: knowledge.id },
+      },
+    },
+  })
+
+  return updateStudent
+}
 
 export const changeParentPassword = async (email: string, password: string) => {
-  const parent = await parentRepository.findOneBy({ email, phoneNumber: '8125200027' });
+  const parent = await prisma.parent.findUnique({ where: { email } })
 
   if (parent) {
-    parent.password = password;
+    parent.password = password
 
-    parent.save();
-
-    return parent;
+    return parent
   }
-};
+}
+
+export const deleteParent = async (id: string) => {
+  const delStudents = prisma.student.deleteMany({ where: { parentId: id } })
+  const delParent = prisma.parent.delete({ where: { id } })
+
+  return await prisma.$transaction([delStudents, delParent])
+}
+
+export const updateParent = async (parent: parent, requestData: Partial<parent>) => {
+  return await prisma.parent.update({
+    where: { id: parent.id },
+    data: {
+      ...requestData,
+    },
+  })
+}

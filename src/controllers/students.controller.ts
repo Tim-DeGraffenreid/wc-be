@@ -1,23 +1,23 @@
-import { NextFunction, Request, Response } from "express";
-import { Student } from "../entity/students.entity";
-import AppDataSource from "../data-source";
+import { NextFunction, Request, Response } from 'express'
 import {
   addToClass,
   createStudent,
+  deleteStudent,
   findStudentById,
   getStudentClasses,
   getStudents,
-} from "../services/students.service";
-import AppError from "../utils/appError";
-import { findClassById } from "../services/class.service";
+  updateStudent,
+} from '../services/students.service'
+import AppError from '../utils/appError'
+import { findClassById } from '../services/class.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
-  const students = await getStudents();
+  const students = await getStudents()
   res.status(200).json({
-    status: "success",
+    status: 'success',
     students,
-  });
-};
+  })
+}
 
 export const createStudentHandler = async (
   req: Request,
@@ -25,23 +25,23 @@ export const createStudentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const student = await createStudent({ ...req.body });
+    const student = await createStudent({ ...req.body })
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       data: {
         student,
       },
-    });
+    })
   } catch (error: any) {
-    if (error?.code === "23505") {
+    if (error?.code === '23505') {
       return res.status(409).json({
-        status: "fail",
-        message: "Student with email already exists",
-      });
+        status: 'fail',
+        message: 'Student with email already exists',
+      })
     }
   }
-};
+}
 
 export const getStudentHandler = async (
   req: Request,
@@ -49,19 +49,19 @@ export const getStudentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const student = await findStudentById(id);
+    const { id } = req.params
+    const student = await findStudentById(id)
     if (!student) {
-      return next(new AppError(404, "Student with id does not exist"));
+      return next(new AppError(404, 'Student with id does not exist'))
     }
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: student,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const deleteStudentHandler = async (
   req: Request,
@@ -69,24 +69,23 @@ export const deleteStudentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const student = await findStudentById(id);
+    const { id } = req.params
+    const student = await findStudentById(id)
     if (!student) {
-      return next(new AppError(404, "Student with id does not exist"));
+      return next(new AppError(404, 'Student with id does not exist'))
     }
 
-    console.log(student);
+    console.log(student)
 
-    student.knowledge = [];
-    await student.remove();
+    await deleteStudent(id)
     res.status(204).json({
-      status: "success",
+      status: 'success',
       data: null,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const updateStudentHandler = async (
   req: Request,
@@ -94,24 +93,23 @@ export const updateStudentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const student = await findStudentById(id);
+    const { id } = req.params
+    let student = await findStudentById(id)
 
     if (!student) {
-      return next(new AppError(404, "Student with id does not exist"));
+      return next(new AppError(404, 'Student with id does not exist'))
     }
 
-    Object.assign(student, req.body);
-    await student.save();
+    student = await updateStudent(student, req.body)
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: student,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const addToClassHandler = async (
   req: Request,
@@ -119,24 +117,24 @@ export const addToClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { classId } = req.params;
+    const { classId } = req.params
 
-    const getClass = await findClassById(classId);
+    const getClass = await findClassById(classId)
 
     if (!getClass) {
-      return res.status(404).json({ error: "Class not found" });
+      return res.status(404).json({ error: 'Class not found' })
     }
 
-    await addToClass(res.locals.user, getClass);
+    await addToClass(res.locals.user.id, getClass.id)
 
     res.status(201).json({
-      status: "success",
-      message: "Added to class successfully",
-    });
+      status: 'success',
+      message: 'Added to class successfully',
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const getStudentClassHandler = async (
   req: Request,
@@ -144,14 +142,14 @@ export const getStudentClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = res.locals.user;
-    const classes = await getStudentClasses(id);
+    const { id } = res.locals.user
+    const classes = await getStudentClasses(id)
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       classes,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

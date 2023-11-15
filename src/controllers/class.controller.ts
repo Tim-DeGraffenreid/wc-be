@@ -1,6 +1,12 @@
-import { NextFunction, Request, Response } from "express";
-import { addClass, findClassById, getCLasses } from "../services/class.service";
-import AppError from "../utils/appError";
+import { NextFunction, Request, Response } from 'express'
+import {
+  addClass,
+  deleteClass,
+  findClassById,
+  getCLasses,
+  updateClass,
+} from '../services/class.service'
+import AppError from '../utils/appError'
 
 export const getClassesHandler = async (
   req: Request,
@@ -8,15 +14,15 @@ export const getClassesHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parents = await getCLasses();
+    const parents = await getCLasses()
     res.status(200).json({
-      status: "success",
+      status: 'success',
       parents,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const addClassHandler = async (
   req: Request,
@@ -24,16 +30,16 @@ export const addClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const newClass = await addClass(req.body);
+    const newClass = await addClass(req.body)
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       data: newClass,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const getClassByIdHandler = async (
   req: Request,
@@ -41,17 +47,17 @@ export const getClassByIdHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const clss = await findClassById(id);
+    const { id } = req.params
+    const clss = await findClassById(id)
     if (!clss) {
-      return next(new AppError(404, "Class with id does not exist"));
+      return next(new AppError(404, 'Class with id does not exist'))
     }
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: clss,
-    });
+    })
   } catch (error) {}
-};
+}
 
 export const updateClassHandler = async (
   req: Request,
@@ -59,24 +65,24 @@ export const updateClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const clss = await findClassById(id);
+    const { id } = req.params
+    const clss = await findClassById(id)
 
     if (!clss) {
-      return next(new AppError(404, "Class with id does not exist"));
+      return next(new AppError(404, 'Class with id does not exist'))
     }
-    const updatedClass = await clss.save();
+    const updatedClass = await updateClass(id, clss)
 
-    Object.assign(clss, req.body);
+    Object.assign(clss, req.body)
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: {
         post: updatedClass,
       },
-    });
+    })
   } catch (error) {}
-};
+}
 
 export const deleteClassHandler = async (
   req: Request,
@@ -84,18 +90,18 @@ export const deleteClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const clss = await findClassById(id);
+    const { id } = req.params
+    const clss = await findClassById(id)
     if (!clss) {
-      return next(new AppError(404, "Class with id does not exist"));
+      return next(new AppError(404, 'Class with id does not exist'))
     }
 
-    await clss.remove();
+    await deleteClass(id)
     res.status(204).json({
-      status: "success",
+      status: 'success',
       data: null,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

@@ -1,15 +1,17 @@
-import { NextFunction, Request, Response } from "express";
-import AppError from "../utils/appError";
+import { NextFunction, Request, Response } from 'express'
+import AppError from '../utils/appError'
 import {
   addChildToClass,
   addDemographic,
   createNewStudent,
+  deleteParent,
   findParentById,
   getParentChild,
   getParents,
   getStudents,
-} from "../services/parents.service";
-import { findClassById } from "../services/class.service";
+  updateParent,
+} from '../services/parents.service'
+import { findClassById } from '../services/class.service'
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -30,15 +32,15 @@ export const getParentsHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parents = await getParents();
+    const parents = await getParents()
     res.status(200).json({
-      status: "success",
+      status: 'success',
       parents,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 /**
  * The `getParentHandler` function is an asynchronous function that retrieves a parent object by its ID
@@ -59,19 +61,19 @@ export const getParentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const parent = await findParentById(id);
+    const { id } = req.params
+    const parent = await findParentById(id)
     if (!parent) {
-      return next(new AppError(404, "Parent with id does not exist"));
+      return next(new AppError(404, 'Parent with id does not exist'))
     }
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: parent,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 /* The `deleteParentHandler` function is an asynchronous function that handles the deletion of a parent
 record. It takes in three parameters: `req` (the request object), `res` (the response object), and
@@ -82,62 +84,62 @@ export const deleteParentHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const parent = await findParentById(id);
+    const { id } = req.params
+    const parent = await findParentById(id)
     if (!parent) {
-      return next(new AppError(404, "Parent with id does not exist"));
+      return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    await parent.remove();
+    await deleteParent(id)
     res.status(204).json({
-      status: "success",
+      status: 'success',
       data: null,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const addStudentsHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { userType, ...parentInfo } = res.locals.user;
-  // if (userType !== "parent") {
-  //   return next(new AppError(401, "Unauthorized"));
-  // }
+  const { userType, id } = res.locals.user
+  if (userType !== 'parent') {
+    return next(new AppError(401, 'Unauthorized'))
+  }
 
   try {
-    const student = await createNewStudent(req.body, parentInfo);
+    const student = await createNewStudent(req.body, id)
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       data: student,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const getStudentsHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { id } = res.locals.user;
+  const { id } = res.locals.user
 
   try {
-    const students = await getStudents(id);
+    const students = await getStudents(id)
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       students,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const updateParentsHandler = async (
   req: Request,
@@ -145,24 +147,23 @@ export const updateParentsHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params;
-    const parent = await findParentById(id);
+    const { id } = req.params
+    let parent = await findParentById(id)
 
     if (!parent) {
-      return next(new AppError(404, "Parent with id does not exist"));
+      return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    Object.assign(parent, req.body);
-    await parent.save();
+    parent = await updateParent(parent, req.body)
 
     res.status(200).json({
-      status: "success",
+      status: 'success',
       data: parent,
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const addDemographicHandler = async (
   req: Request,
@@ -170,20 +171,20 @@ export const addDemographicHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = res.locals.user;
+    const { id } = res.locals.user
 
-    const updatedData = await addDemographic(id, req.body);
+    const updatedData = await addDemographic(id, req.body)
 
     res.status(201).json({
-      status: "success",
+      status: 'success',
       data: {
         parent: updatedData,
       },
-    });
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}
 
 export const addChildToClassHandler = async (
   req: Request,
@@ -191,23 +192,23 @@ export const addChildToClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { id } = res.locals.user;
-    const { studentId, classId } = req.params;
+    const { id } = res.locals.user
+    const { studentId, classId } = req.params
 
-    const student = await getParentChild(id, studentId);
-    const getClass = await findClassById(classId);
+    const student = await getParentChild(id, studentId)
+    const getClass = await findClassById(classId)
 
     if (!student || !getClass) {
-      return res.status(404).json({ error: "Student or class not found" });
+      return res.status(404).json({ error: 'Student or class not found' })
     }
 
-    await addChildToClass(student, getClass);
+    await addChildToClass(student, classId)
 
     res.status(201).json({
-      status: "success",
-      message: "Student added to class successfully",
-    });
+      status: 'success',
+      message: 'Student added to class successfully',
+    })
   } catch (error) {
-    next(error);
+    next(error)
   }
-};
+}

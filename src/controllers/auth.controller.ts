@@ -1,11 +1,10 @@
 import { CookieOptions, NextFunction, Request, Response } from 'express'
-import AppDataSource from '../data-source'
-import { Student } from '../entity/students.entity'
-import { Parent } from '../entity/parents.entity'
 import AppError from '../utils/appError'
 import { createParent, findParentByEmail } from '../services/parents.service'
 import { signTokens } from '../services/auth.service'
 import { createStudent, findStudentByDetails } from '../services/students.service'
+import { comparePasswords } from '../utils/password.manager'
+import prisma from '../utils/prisma'
 
 const accessTokenExpiresInMinutes = Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
 if (isNaN(accessTokenExpiresInMinutes)) {
@@ -98,15 +97,22 @@ export const registerStudent = async (
 export const login = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password, userType } = req.body
-    const repository = userType === 'student' ? Student : Parent
-    const userRepository = AppDataSource.getRepository(repository)
 
-    const user = await userRepository.findOneBy({ email })
-    if (!user || !(await repository.comparePasswords(password, user.password))) {
+    let user
+    if (userType === 'parent') {
+      user = await prisma.parent.findUnique({
+        where: { email },
+      })
+    } else {
+      user = await prisma.student.findUnique({
+        where: { email },
+      })
+    }
+
+    if (!user || !(await comparePasswords(password, user.password))) {
       return next(new AppError(400, 'Invalid email or password'))
     }
 
-    //
     const { access_token } = await signTokens(user)
 
     res.cookie('access_token', access_token, accessTokenCookieOptions)
