@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model classes {
+  id         String      @id(map: "PK_e207aa15404e9b2ce35910f9f7f") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at DateTime    @default(now()) @db.Timestamp(6)
+  updated_at DateTime    @default(now()) @db.Timestamp(6)
+  name       String      @unique(map: "UQ_1f3940af28a76098f31004f03ca") @db.VarChar
+  knowledge  knowledge[]
+}
+
+model demographic_info {
+  id                 String   @id(map: "PK_b433de03c16df6e2938ba93b29e") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at         DateTime @default(now()) @db.Timestamp(6)
+  updated_at         DateTime @default(now()) @db.Timestamp(6)
+  zipCode            String   @db.VarChar
+  address            String   @db.VarChar
+  foodStampEligible  Boolean
+  ethnicity          String   @db.VarChar
+  householdIncome    String   @db.VarChar
+  disclaimerAccepted String   @db.VarChar
+  parent             parent?
+}
+
+model knowledge {
+  id         String   @id(map: "PK_4159ba98b65a20a8d1f257bc514") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamp(6)
+  updated_at DateTime @default(now()) @db.Timestamp(6)
+  grade      String?  @db.VarChar
+  skills     String?  @db.VarChar
+  studentId  String?  @db.Uuid
+  classId    String?  @db.Uuid
+  student    student? @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_5d9bbc4ee7cf0682ffc455bf0a0")
+  classes    classes? @relation(fields: [classId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6ba1ffbe524f3191da99ebfc4d6")
+}
+
+model parent {
+  id                    String            @id(map: "PK_bf93c41ee1ae1649869ebd05617") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at            DateTime          @default(now()) @db.Timestamp(6)
+  updated_at            DateTime          @default(now()) @db.Timestamp(6)
+  email                 String            @unique(map: "UQ_9158391af7b8ca4911efaad8a73") @db.VarChar
+  password              String            @db.VarChar
+  fName                 String            @db.VarChar
+  lName                 String            @db.VarChar
+  phoneNumber           String            @db.VarChar
+  birthday              DateTime          @db.Date
+  educationLevel        String            @db.VarChar
+  veteranStatus         String            @db.VarChar
+  regularTransportation Boolean
+  housingStatus         String            @db.VarChar
+  demographicInfoId     String?           @unique(map: "REL_58da1e5e410ef2ba35d6944ade") @db.Uuid
+  demographic_info      demographic_info? @relation(fields: [demographicInfoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_58da1e5e410ef2ba35d6944ade5")
+  student               student[]
+
+  @@index([email], map: "parent_email_index")
+}
+
+model student {
+  id          String              @id(map: "PK_3d8016e1cb58429474a3c041904") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at  DateTime            @default(now()) @db.Timestamp(6)
+  updated_at  DateTime            @default(now()) @db.Timestamp(6)
+  email       String              @unique(map: "UQ_a56c051c91dbe1068ad683f536e") @db.VarChar
+  password    String              @db.VarChar
+  fName       String              @db.VarChar
+  lName       String              @db.VarChar
+  phoneNumber String              @db.VarChar
+  birthday    DateTime            @db.Date
+  grade       String              @db.VarChar
+  schoolName  String              @db.VarChar
+  gender      student_gender_enum
+  zipCode     String              @db.VarChar
+  parentId    String?             @db.Uuid
+  knowledge   knowledge[]
+  parent      parent?             @relation(fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d728e971c60c58a818dd9e614ab")
+
+  @@index([email], map: "student_email_index")
+}
+
+enum student_gender_enum {
+  male
+  female
+}

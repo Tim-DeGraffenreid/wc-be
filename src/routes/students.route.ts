@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express'
 import {
   addToClassHandler,
   createStudentHandler,
@@ -7,28 +7,26 @@ import {
   getStudentHandler,
   getStudentsHandler,
   updateStudentHandler,
-} from "../controllers/students.controller";
-import { validate } from "../middlewares/validate";
-import { studentSchema, updateStudentSchema } from "../schemas/student.schema";
-import { deserializeUser } from "../middlewares/deserializeUser";
-import { requireUser } from "../middlewares/requireUser";
+} from '../controllers/students.controller'
+import { validate } from '../middlewares/validate'
+import { studentSchema, updateStudentSchema } from '../schemas/student.schema'
+import { deserializeUser } from '../middlewares/deserializeUser'
+import { requireUser } from '../middlewares/requireUser'
 
-const router = express.Router();
+const router = express.Router()
 
 router
-  .route("/")
+  .route('/')
   .get(getStudentsHandler)
-  .post(validate(studentSchema), createStudentHandler);
+  .post(validate(studentSchema), createStudentHandler)
+router.route('/classes').get(deserializeUser, requireUser, getStudentClassHandler)
 router
-  .route("/classes")
-  .get(deserializeUser, requireUser, getStudentClassHandler);
-router
-  .route("/:id")
+  .route('/:id')
   .get(getStudentHandler)
   .patch(validate(updateStudentSchema), updateStudentHandler)
-  .delete(deleteStudentHandler);
+  .delete(deleteStudentHandler)
 router
-  .route("add-to-class/:classId")
-  .post(deserializeUser, requireUser, addToClassHandler);
+  .route('add-to-class/:classId')
+  .post(deserializeUser, requireUser, addToClassHandler)
 
-export default router;
+export default router
