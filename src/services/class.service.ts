@@ -1,4 +1,3 @@
-import { DeepPartial } from 'typeorm'
 import prisma from '../utils/prisma'
 import { classes } from '@prisma/client'
 
