@@ -8,6 +8,7 @@ export const getStudents = async () => {
 
 export const createStudent = async (data: any) => {
   data.password = await hashPassword(data.password)
+  data.birthday = new Date(data.birthday).toISOString()
   return await prisma.student.create({
     data: {
       ...data,
@@ -67,7 +68,7 @@ export const findStudentByDetails = async (data: any) => {
   })
 
   if (response) {
-    response.password = password
+    response.password = await hashPassword(password)
     await prisma.student.update({ where: { id: response.id }, data: { ...response } })
     return response
   }

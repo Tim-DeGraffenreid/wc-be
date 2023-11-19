@@ -48,12 +48,19 @@ export const registerParent = async (req: Request, res: Response, next: NextFunc
       },
     })
   } catch (error: any) {
-    if (error?.code === '23505') {
+    if (error?.code === 'P2002' && error.meta?.target?.includes('email')) {
+      // Unique constraint violation on email field
       return res.status(409).json({
         status: 'fail',
-        message: 'Parent with email already exists',
+        message: 'Email address is already in use.',
       })
     }
+
+    console.error('Unexpected Error:', error)
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected error occurred.',
+    })
   }
 }
 
@@ -85,12 +92,19 @@ export const registerStudent = async (
       },
     })
   } catch (error: any) {
-    if (error?.code === '23505') {
+    if (error?.code === 'P2002' && error.meta?.target?.includes('email')) {
+      // Unique constraint violation on email field
       return res.status(409).json({
         status: 'fail',
-        message: 'Student with email already exists',
+        message: 'Email address is already in use.',
       })
     }
+
+    console.error('Unexpected Error:', error)
+    res.status(500).json({
+      status: 'error',
+      message: 'An unexpected error occurred.',
+    })
   }
 }
 
