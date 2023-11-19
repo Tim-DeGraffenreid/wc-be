@@ -1,14 +1,19 @@
 import { hashPassword } from '../utils/password.manager'
 import prisma from '../utils/prisma'
-import { demographic_info, parent, student } from '@prisma/client'
+import { Prisma, demographic_info, parent, student } from '@prisma/client'
 
 export const getParents = async () => {
   return await prisma.parent.findMany()
 }
 
-export const createParent = async (data: parent) => {
+export const createParent = async (data: Prisma.parentCreateInput) => {
   data.password = await hashPassword(data.password)
-  return await prisma.parent.create({ data })
+  data.birthday = new Date(data.birthday).toISOString()
+  const parent = await prisma.parent.create({
+    data,
+  })
+
+  return parent
 }
 
 export const findParentByEmail = async ({ email }: { email: string }) => {
