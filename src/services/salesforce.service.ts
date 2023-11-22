@@ -1,3 +1,4 @@
+import { parent, student } from '@prisma/client'
 import axios from 'axios'
 // //FixThis: Put these in vercel environment variables when you switch out of
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token' // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
@@ -41,6 +42,76 @@ apiClient.interceptors.request.use(async (config) => {
   config.headers['X-Authorization-Date'] = new Date().toUTCString()
   return config
 })
+
+export const addStudentToSalesforce = async (student: student) => {
+  try {
+    const data = {
+      Parent_or_Student__c: 'student',
+      CreatedDate: student.created_at,
+      Email: student.email,
+      LastName: student.lName,
+      FirstName: student.fName,
+      Phone: student.phoneNumber,
+      Birthdate: student.birthday,
+      Grade__c: student.grade,
+      School__c: student.schoolName,
+      Gender__c: student.gender,
+      MailingPostalCode: student.zipCode,
+    }
+    const response = await apiClient.post('/services/data/v52.0/sobjects/COntact', data)
+
+    return response.data
+  } catch (error) {
+    console.error('Creation of student to salesforce failed:', error)
+    throw error
+  }
+}
+
+export const addParentToSalesforce = async (parent: parent) => {
+  try {
+    const data = {
+      Parent_or_Student__c: 'parent',
+      CreatedDate: parent.created_at,
+      Email: parent.email,
+      LastName: parent.lName,
+      FirstName: parent.fName,
+      Phone: parent.phoneNumber,
+      Birthdate: parent.birthday,
+      Education_Level__c: parent.educationLevel,
+      Veteran_Status__c: parent.veteranStatus,
+      Do_you_have_regular_transportation__c: parent.regularTransportation,
+      Residence_Type__c: parent.housingStatus,
+    }
+    const response = await apiClient.post('/services/data/v52.0/sobjects/COntact', data)
+
+    return response.data
+  } catch (error) {
+    console.error('Creation of student to salesforce failed:', error)
+    throw error
+  }
+}
+
+export const syncDatabaseAndSalesforce = async () => {
+  try {
+    const salesforceData = await getDataFromSalesforce()
+
+  } catch (error) {
+    console.error('Error while syncing', error)
+    throw error
+  }
+}
+
+export const getDataFromSalesforce = async () => {
+  try {
+    const response = await apiClient.get(
+      `/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName,Email,CreatedDate,Parent_or_Student__c,Phone,BirthDate,Grade__c,School__c,Gender__c,MailingPostalCode,Education_Level__c,Veteran_Status__c,Do_you_have_regular_transportation__c,Residence_Type__c+FROM+Contact`
+    )
+    return response.data
+  } catch (error) {
+    console.error('Error fetching data from salesforce:', error)
+    throw error
+  }
+}
 
 // // Function to add a new Contact in Salesforce
 // export const addContact = async (contactData: any) => {
