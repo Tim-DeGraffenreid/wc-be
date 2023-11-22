@@ -94,7 +94,6 @@ export const addParentToSalesforce = async (parent: parent) => {
 export const syncDatabaseAndSalesforce = async () => {
   try {
     const salesforceData = await getDataFromSalesforce()
-
   } catch (error) {
     console.error('Error while syncing', error)
     throw error
@@ -112,6 +111,8 @@ export const getDataFromSalesforce = async () => {
     throw error
   }
 }
+
+// testing
 
 // // Function to add a new Contact in Salesforce
 // export const addContact = async (contactData: any) => {
