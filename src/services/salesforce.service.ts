@@ -57,8 +57,9 @@ export const addStudentToSalesforce = async (student: student) => {
       School__c: student.schoolName,
       Gender__c: student.gender,
       MailingPostalCode: student.zipCode,
+      Id: student.id,
     }
-    const response = await apiClient.post('/services/data/v52.0/sobjects/COntact', data)
+    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
     return response.data
   } catch (error) {
@@ -81,8 +82,9 @@ export const addParentToSalesforce = async (parent: parent) => {
       Veteran_Status__c: parent.veteranStatus,
       Do_you_have_regular_transportation__c: parent.regularTransportation,
       Residence_Type__c: parent.housingStatus,
+      Id: parent.id,
     }
-    const response = await apiClient.post('/services/data/v52.0/sobjects/COntact', data)
+    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
     return response.data
   } catch (error) {
@@ -91,10 +93,75 @@ export const addParentToSalesforce = async (parent: parent) => {
   }
 }
 
+export const updateStudentSalesforce = async (id: string, student: student) => {
+  try {
+    const data = {
+      CreatedDate: student.created_at,
+      Email: student.email,
+      LastName: student.lName,
+      FirstName: student.fName,
+      Phone: student.phoneNumber,
+      Birthdate: student.birthday,
+      Grade__c: student.grade,
+      School__c: student.schoolName,
+      Gender__c: student.gender,
+      MailingPostalCode: student.zipCode,
+    }
+
+    const response = await apiClient.patch(
+      `/services/data/v52.0/sobjects/Contact/${id}`,
+      data
+    )
+
+    return response.data
+  } catch (error) {
+    console.error('Update of student to salesforce failed:', error)
+    throw error
+  }
+}
+
+export const updateParentSalesforce = async (id: string, parent: parent) => {
+  try {
+    const data = {
+      CreatedDate: parent.created_at,
+      Email: parent.email,
+      LastName: parent.lName,
+      FirstName: parent.fName,
+      Phone: parent.phoneNumber,
+      Birthdate: parent.birthday,
+      Education_Level__c: parent.educationLevel,
+      Veteran_Status__c: parent.veteranStatus,
+      Do_you_have_regular_transportation__c: parent.regularTransportation,
+      Residence_Type__c: parent.housingStatus,
+    }
+    const response = await apiClient.patch(
+      `/services/data/v52.0/sobjects/Contact/${id}`,
+      data
+    )
+
+    return response.data
+  } catch (error) {
+    console.error('Update of student to salesforce failed:', error)
+    throw error
+  }
+}
+
+export const deleteUser = async (id: string) => {
+  try {
+    const response = await apiClient.delete(`/services/data/v52.0/sObjects/Contact/${id}`)
+
+    return response.data
+  } catch (error) {
+    console.error('Deletion of salesforce failed:', error)
+    throw error
+  }
+}
+
 export const syncDatabaseAndSalesforce = async () => {
   try {
     const salesforceData = await getDataFromSalesforce()
 
+    console.log(salesforceData)
   } catch (error) {
     console.error('Error while syncing', error)
     throw error
@@ -112,6 +179,8 @@ export const getDataFromSalesforce = async () => {
     throw error
   }
 }
+
+// testing
 
 // // Function to add a new Contact in Salesforce
 // export const addContact = async (contactData: any) => {
