@@ -8,7 +8,7 @@ export const getStudents = async () => {
 
 export const createStudent = async (data: student) => {
   data.password = await hashPassword(data.password)
-  data.birthday = new Date(data.birthday).toISOString()
+  data.birthday = new Date(data.birthday)
   return await prisma.student.create({
     data: {
       ...data,
