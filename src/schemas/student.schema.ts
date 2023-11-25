@@ -1,5 +1,5 @@
 import { nativeEnum, object, string } from 'zod'
-import { student_gender_enum } from '@prisma/client'
+import { grades, student_gender_enum } from '@prisma/client'
 
 export const studentSchema = object({
   body: object({
@@ -11,7 +11,7 @@ export const studentSchema = object({
     birthday: string({
       required_error: 'birthday is required',
     }).regex(/^\d{4}-\d{2}-\d{2}$/),
-    grade: string({ required_error: 'grade is required' }),
+    grade: nativeEnum(grades),
     schoolName: string({ required_error: 'schoolName is required' }),
     gender: nativeEnum(student_gender_enum),
     zipCode: string({ required_error: 'zipCode is required' }).regex(/^\d{5}$/),
@@ -48,7 +48,7 @@ export const updateStudentSchema = object({
     birthday: string({
       required_error: 'birthday is required',
     }).regex(/^\d{4}-\d{2}-\d{2}$/),
-    grade: string({ required_error: 'grade is required' }),
+    grade: nativeEnum(grades),
     schoolName: string({ required_error: 'schoolName is required' }),
     gender: nativeEnum(student_gender_enum),
     zipCode: string({ required_error: 'zipCode is required' }).regex(/^\d{5}$/),

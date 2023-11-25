@@ -50,13 +50,14 @@ model parent {
   lName                 String            @db.VarChar
   phoneNumber           String            @db.VarChar
   birthday              DateTime          @db.Date
-  educationLevel        String            @db.VarChar
-  veteranStatus         String            @db.VarChar
+  educationLevel        educationLevel
+  veteranStatus         veteranStatus
   regularTransportation Boolean
-  housingStatus         String            @db.VarChar
+  housingStatus         housingStatus
   demographicInfoId     String?           @unique(map: "REL_58da1e5e410ef2ba35d6944ade") @db.Uuid
   demographic_info      demographic_info? @relation(fields: [demographicInfoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_58da1e5e410ef2ba35d6944ade5")
   student               student[]
+  salesforceId          String
 
   @@index([email], map: "parent_email_index")
 }
@@ -71,18 +72,62 @@ model student {
   lName       String              @db.VarChar
   phoneNumber String              @db.VarChar
   birthday    DateTime            @db.Date
-  grade       String              @db.VarChar
+  grade       grades
   schoolName  String              @db.VarChar
   gender      student_gender_enum
   zipCode     String              @db.VarChar
   parentId    String?             @db.Uuid
   knowledge   knowledge[]
   parent      parent?             @relation(fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d728e971c60c58a818dd9e614ab")
+  salesforceId          String
+
 
   @@index([email], map: "student_email_index")
 }
 
 enum student_gender_enum {
-  male
-  female
+  Male
+  Female
+  NonBinary
+  PreferNotToSay
+}
+
+enum grades {
+  First
+  Second
+  Third
+  Fourth
+  Fifth
+  Sixth
+  Seventh
+  Eighth
+  Freshman
+  Sophomore
+  Junior
+  Senior
+}
+
+enum educationLevel {
+  NoSchooling
+  SomeHighSchoolOrLess
+  HighSchoolGraduateGED
+  SomeCollege
+  AssociatesDegree
+  BachelorsDegree
+  SomeGraduateSchool
+  MastersDegree
+  DoctoralDegree
+}
+
+enum veteranStatus {
+  NotAVeteran
+  BelongToSeveralClassifications
+  NotProtectedVeteran
+  ChooseNotToIdentify
+}
+
+enum housingStatus {
+  Rent
+  Own
+  CurrentlyDisplaced
 }

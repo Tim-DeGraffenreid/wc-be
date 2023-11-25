@@ -9,7 +9,7 @@ const username = 'timd061677@wecodekc.org.eventtest' // Salesforce username
 const password = 'T1i2m3d4@sf' //Salesforce password
 const securityToken = 'yz5NJ0qP3FanqJx0Awb8UqVJ3' //Salesforce security token
 
-// // Function to obtain an access token using the Salesforce user-password flow
+// Function to obtain an access token using the Salesforce user-password flow
 const getAccessToken = async () => {
   const response = await axios.post(
     tokenUrl,
@@ -47,17 +47,15 @@ export const addStudentToSalesforce = async (student: student) => {
   try {
     const data = {
       Parent_or_Student__c: 'student',
-      CreatedDate: student.created_at,
       Email: student.email,
       LastName: student.lName,
       FirstName: student.fName,
       Phone: student.phoneNumber,
       Birthdate: student.birthday,
-      Grade__c: student.grade,
+      Grade__c: GradeLevel[student.grade],
       School__c: student.schoolName,
-      Gender__c: student.gender,
+      Gender__c: Gender[student.gender],
       MailingPostalCode: student.zipCode,
-      Id: student.id,
     }
     const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
@@ -72,23 +70,36 @@ export const addParentToSalesforce = async (parent: parent) => {
   try {
     const data = {
       Parent_or_Student__c: 'parent',
-      CreatedDate: parent.created_at,
       Email: parent.email,
       LastName: parent.lName,
       FirstName: parent.fName,
       Phone: parent.phoneNumber,
       Birthdate: parent.birthday,
-      Education_Level__c: parent.educationLevel,
-      Veteran_Status__c: parent.veteranStatus,
-      Do_you_have_regular_transportation__c: parent.regularTransportation,
-      Residence_Type__c: parent.housingStatus,
-      Id: parent.id,
+      Education_Level__c: EducationLevel[parent.educationLevel],
+      Veteran_Status__c: VeteranStatus[parent.veteranStatus],
+      Do_you_have_regular_transportation__c: parent.regularTransportation ? 'Yes' : 'No',
+      Residence_Type__c: HousingStatus[parent.housingStatus],
     }
+
+    console.log(data)
     const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
+    console.log(response.data)
+
     return response.data
-  } catch (error) {
-    console.error('Creation of student to salesforce failed:', error)
+  } 
+  catch (error: any) {
+    console.error('Creation of parent to salesforce failed:', error)
+
+    if (error.response) {
+      console.error('Response error:', error.response.data[0]?.errorCode)
+
+      throw error.response.data[0]?.errorCode
+    } else if (error.request) {
+      console.error('No response received:', error.request)
+    } else {
+      console.error('Request setup error:', error.message)
+    }
     throw error
   }
 }
@@ -96,15 +107,14 @@ export const addParentToSalesforce = async (parent: parent) => {
 export const updateStudentSalesforce = async (id: string, student: student) => {
   try {
     const data = {
-      CreatedDate: student.created_at,
       Email: student.email,
       LastName: student.lName,
       FirstName: student.fName,
       Phone: student.phoneNumber,
       Birthdate: student.birthday,
-      Grade__c: student.grade,
+      Grade__c: GradeLevel[student.grade],
       School__c: student.schoolName,
-      Gender__c: student.gender,
+      Gender__c: Gender[student.gender],
       MailingPostalCode: student.zipCode,
     }
 
@@ -123,16 +133,16 @@ export const updateStudentSalesforce = async (id: string, student: student) => {
 export const updateParentSalesforce = async (id: string, parent: parent) => {
   try {
     const data = {
-      CreatedDate: parent.created_at,
+      Parent_or_Student__c: 'parent',
       Email: parent.email,
       LastName: parent.lName,
       FirstName: parent.fName,
       Phone: parent.phoneNumber,
       Birthdate: parent.birthday,
-      Education_Level__c: parent.educationLevel,
-      Veteran_Status__c: parent.veteranStatus,
-      Do_you_have_regular_transportation__c: parent.regularTransportation,
-      Residence_Type__c: parent.housingStatus,
+      Education_Level__c: EducationLevel[parent.educationLevel],
+      Veteran_Status__c: VeteranStatus[parent.veteranStatus],
+      Do_you_have_regular_transportation__c: parent.regularTransportation ? 'Yes' : 'No',
+      Residence_Type__c: HousingStatus[parent.housingStatus],
     }
     const response = await apiClient.patch(
       `/services/data/v52.0/sobjects/Contact/${id}`,
@@ -178,6 +188,54 @@ export const getDataFromSalesforce = async () => {
     console.error('Error fetching data from salesforce:', error)
     throw error
   }
+}
+
+const GradeLevel = {
+  First: '1st',
+  Second: '2nd',
+  Third: '3rd',
+  Fourth: '4th',
+  Fifth: '5th',
+  Sixth: '6th',
+  Seventh: '7th',
+  Eighth: '8th',
+  Freshman: 'Freshman',
+  Sophomore: 'Sophomore',
+  Junior: 'Junior',
+  Senior: 'Senior',
+}
+
+const Gender = {
+  Male: 'Male',
+  Female: 'Female',
+  NonBinary: 'Non-Binary',
+  PreferNotToSay: 'Prefer Not To Say',
+}
+
+const EducationLevel = {
+  NoSchooling: 'No Schooling',
+  SomeHighSchoolOrLess: 'Some High School or less',
+  HighSchoolGraduateGED: 'High School Graduate/GED',
+  SomeCollege: 'Some College',
+  AssociatesDegree: "Associate's Degree",
+  BachelorsDegree: "Bachelor's Degree",
+  SomeGraduateSchool: 'Some Graduate School',
+  MastersDegree: "Master's Degree",
+  DoctoralDegree: 'Doctoral Degree',
+}
+
+const VeteranStatus = {
+  NotAVeteran: 'I am not a veteran',
+  BelongToSeveralClassifications:
+    'I belong to several classifications of protected veterans',
+  NotProtectedVeteran: 'I am NOT a protected veteran',
+  ChooseNotToIdentify: 'I choose not to identify my veteran status',
+}
+
+const HousingStatus = {
+  Rent: 'Rent',
+  Own: 'Own',
+  CurrentlyDisplaced: 'Currently Displaced',
 }
 
 // testing
