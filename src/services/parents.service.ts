@@ -70,6 +70,14 @@ export const addDemographic = async (id: string, data: demographic_info) => {
   return parent
 }
 
+export const getDemographicInfo = async (id: string) => {
+  const demographic = await prisma.demographic_info.findFirst({
+    where: { parent: { id } },
+  })
+
+  return demographic
+}
+
 export const getParentChild = async (parentId: string, childId: string) => {
   return await prisma.student.findFirst({
     where: { parent: { id: parentId }, id: childId },

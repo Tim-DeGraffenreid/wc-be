@@ -6,6 +6,7 @@ import {
   createNewStudent,
   deleteParent,
   findParentById,
+  getDemographicInfo,
   getParentChild,
   getParents,
   getStudents,
@@ -180,6 +181,25 @@ export const addDemographicHandler = async (
       data: {
         parent: updatedData,
       },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getDemographicHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = res.locals.user
+
+    const data = await getDemographicInfo(id)
+
+    res.status(200).json({
+      status: 'success',
+      data,
     })
   } catch (error) {
     next(error)
