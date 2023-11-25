@@ -10,6 +10,7 @@ import {
 } from '../services/students.service'
 import AppError from '../utils/appError'
 import { findClassById } from '../services/class.service'
+import { deleteUser } from '../services/salesforce.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -71,17 +72,19 @@ export const deleteStudentHandler = async (
   try {
     const { id } = req.params
     const student = await findStudentById(id)
-    if (!student) {
-      return next(new AppError(404, 'Student with id does not exist'))
+    const deleteFromSalesforce = await deleteUser(id)
+
+    if (deleteFromSalesforce) {
+      if (!student) {
+        return next(new AppError(404, 'Student with id does not exist'))
+      }
+
+      await deleteStudent(id)
+      res.status(204).json({
+        status: 'success',
+        data: null,
+      })
     }
-
-    console.log(student)
-
-    await deleteStudent(id)
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    })
   } catch (error) {
     next(error)
   }

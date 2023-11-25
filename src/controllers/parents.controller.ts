@@ -13,6 +13,7 @@ import {
   updateParent,
 } from '../services/parents.service'
 import { findClassById } from '../services/class.service'
+import { deleteUser } from '../services/salesforce.service'
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -91,11 +92,15 @@ export const deleteParentHandler = async (
       return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    await deleteParent(id)
-    res.status(204).json({
-      status: 'success',
-      data: null,
-    })
+    const deleteFromSalesforce = await deleteUser(id)
+
+    if (deleteFromSalesforce) {
+      await deleteParent(id)
+      res.status(204).json({
+        status: 'success',
+        data: null,
+      })
+    }
   } catch (error) {
     next(error)
   }
