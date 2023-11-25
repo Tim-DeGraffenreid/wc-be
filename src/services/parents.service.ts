@@ -8,7 +8,7 @@ export const getParents = async () => {
 
 export const createParent = async (data: Prisma.parentCreateInput) => {
   data.password = await hashPassword(data.password)
-  data.birthday = new Date(data.birthday).toISOString()
+  data.birthday = new Date(data.birthday)
   const parent = await prisma.parent.create({
     data,
   })
