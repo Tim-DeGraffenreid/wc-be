@@ -6,7 +6,7 @@ export const getStudents = async () => {
   return await prisma.student.findMany()
 }
 
-export const createStudent = async (data: any) => {
+export const createStudent = async (data: student) => {
   data.password = await hashPassword(data.password)
   data.birthday = new Date(data.birthday).toISOString()
   return await prisma.student.create({
