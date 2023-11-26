@@ -30,7 +30,7 @@ const accessTokenCookieOptions: CookieOptions = {
 
 export const registerParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const salesforce = await addParentToSalesforce({ ...req.body, id: 'testingId' })
+    const salesforce = await addParentToSalesforce(req.body)
     if (salesforce) {
       const parent = await createParent({ ...req.body, salesforceId: salesforce.id })
 
@@ -77,7 +77,7 @@ export const registerStudent = async (
   next: NextFunction
 ) => {
   try {
-    const salesforce = await addStudentToSalesforce({ ...req.body, id: 'testoingiu' })
+    const salesforce = await addStudentToSalesforce(req.body)
     const student = await createStudent({ ...req.body, salesforceId: salesforce.id })
 
     const { access_token } = await signTokens(student)
