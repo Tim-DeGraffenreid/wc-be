@@ -13,7 +13,7 @@ import {
   updateParent,
 } from '../services/parents.service'
 import { findClassById } from '../services/class.service'
-import { deleteUser } from '../services/salesforce.service'
+import { addStudentToSalesforce, deleteUser } from '../services/salesforce.service'
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -117,12 +117,18 @@ export const addStudentsHandler = async (
   }
 
   try {
-    const student = await createNewStudent(req.body, id)
+    const salesforce = await addStudentToSalesforce(req.body)
+    if (salesforce) {
+      const student = await createNewStudent(
+        { ...req.body, salesforceId: salesforce?.id },
+        id
+      )
 
-    res.status(201).json({
-      status: 'success',
-      data: student,
-    })
+      res.status(201).json({
+        status: 'success',
+        data: student,
+      })
+    }
   } catch (error) {
     next(error)
   }
