@@ -49,6 +49,9 @@ export const addToClass = async (student: student, classId: string) => {
 }
 
 export const updateStudent = async (student: student, requestData: Partial<student>) => {
+  if (requestData.birthday) {
+    requestData.birthday = new Date(requestData.birthday)
+  }
   return await prisma.student.update({
     where: { id: student.id },
     data: {
