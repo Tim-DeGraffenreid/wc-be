@@ -25,6 +25,7 @@ export const findParentById = async (userId: string) => {
 }
 
 export const createNewStudent = async (studentData: student, parentId: string) => {
+  studentData.birthday = new Date(studentData.birthday)
   const student = await prisma.student.create({
     data: {
       ...studentData,
@@ -126,6 +127,9 @@ export const deleteParent = async (id: string) => {
 }
 
 export const updateParent = async (parent: parent, requestData: Partial<parent>) => {
+  if (requestData.birthday) {
+    requestData.birthday = new Date(requestData.birthday)
+  }
   return await prisma.parent.update({
     where: { id: parent.id },
     data: {
