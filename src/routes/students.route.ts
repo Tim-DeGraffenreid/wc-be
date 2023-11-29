@@ -26,7 +26,7 @@ router
   .patch(validate(updateStudentSchema), updateStudentHandler)
   .delete(deleteStudentHandler)
 router
-  .route('add-to-class/:classId')
+  .route('/add-to-class/:classId')
   .post(deserializeUser, requireUser, addToClassHandler)
 
 export default router
