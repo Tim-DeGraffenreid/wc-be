@@ -47,7 +47,10 @@ export const createNewStudent = async (studentData: student, parentId: string) =
 }
 
 export const getStudents = async (id: string) => {
-  return await prisma.student.findMany({ where: { parent: { id } } })
+  return await prisma.student.findMany({
+    where: { parent: { id } },
+    include: { knowledge: true },
+  })
 }
 
 export const addDemographic = async (id: string, data: demographic_info) => {
