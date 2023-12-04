@@ -9,6 +9,7 @@ import express, {
 } from 'express'
 import cors from 'cors'
 import cookieparser from 'cookie-parser'
+import cron from 'node-cron'
 
 import parentRouter from './routes/parents.route'
 import studentRouter from './routes/students.route'
@@ -16,6 +17,7 @@ import authRouter from './routes/auth.route'
 import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient, { connectRedis } from './utils/connectRedis'
+import { syncDatabaseAndSalesforce } from './services/salesforce.service'
 
 connectRedis()
   .then(async () => {
@@ -32,6 +34,15 @@ connectRedis()
     app.use('/api/class', classRouter)
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
+
+    // Sync salesforce data every 2hrs
+    cron.schedule('0 */2 * * *', async () => {
+      try {
+        await syncDatabaseAndSalesforce()
+      } catch (error) {
+        console.error('Error during scheduled synchronization:', error)
+      }
+    })
 
     app.get('/api/healthChecker', async (req: Request, res: Response) => {
       const message = await redisClient.get('try')

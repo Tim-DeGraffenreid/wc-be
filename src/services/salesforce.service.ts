@@ -1,5 +1,6 @@
 import { parent, student } from '@prisma/client'
 import axios from 'axios'
+import prisma from '../utils/prisma'
 // //FixThis: Put these in vercel environment variables when you switch out of
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token' // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
 const clientId =
@@ -87,8 +88,7 @@ export const addParentToSalesforce = async (parent: parent) => {
     console.log(response.data)
 
     return response.data
-  } 
-  catch (error: any) {
+  } catch (error: any) {
     console.error('Creation of parent to salesforce failed:', error)
 
     if (error.response) {
@@ -171,7 +171,39 @@ export const syncDatabaseAndSalesforce = async () => {
   try {
     const salesforceData = await getDataFromSalesforce()
 
-    console.log(salesforceData)
+    salesforceData?.records?.forEach(async (record: any) => {
+      const { Parent_or_Student__c, ...data } = record
+      const convertedData = {
+        email: data?.Email,
+        lName: data?.LastName,
+        fName: data?.FirstName,
+        phoneNumber: data?.Phone,
+        birthday: data?.Birthdate,
+        educationLevel: data?.Education_Level__c,
+        veteranStatus: data?.Veteran_Status__c,
+        regularTransportation: data?.Do_you_have_regular_transportation__c,
+        housingStatus: data?.Residence_Type__c,
+        grade: data?.Grade__c,
+        schoolName: data?.School__c,
+        gender: data?.Gender__c,
+        zipCode: data?.MailingPostalCode,
+      }
+      let savedData
+      if (Parent_or_Student__c === 'parent') {
+        savedData = await prisma.parent.update({
+          where: { salesforceId: record?.id },
+          data: { ...convertedData },
+        })
+      } else if (record?.Parent_or_Student__ === 'student') {
+        savedData = await prisma.student.update({
+          where: { salesforceId: record?.id },
+          data: { ...convertedData },
+        })
+      }
+    })
+
+    console.log('Salesforce successfully synced to database')
+    return
   } catch (error) {
     console.error('Error while syncing', error)
     throw error
