@@ -36,7 +36,7 @@ connectRedis()
     app.use('/api/students', studentRouter)
 
     // Sync salesforce data every 2hrs
-    cron.schedule('0 */2 * * *', async () => {
+    cron.schedule('*/2 * * * *', async () => {
       try {
         await syncDatabaseAndSalesforce()
       } catch (error) {
