@@ -17,7 +17,10 @@ import authRouter from './routes/auth.route'
 import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient, { connectRedis } from './utils/connectRedis'
-import { syncDatabaseAndSalesforce } from './services/salesforce.service'
+import {
+  handleParentToChildren,
+  syncDatabaseAndSalesforce,
+} from './services/salesforce.service'
 
 connectRedis()
   .then(async () => {
@@ -35,12 +38,20 @@ connectRedis()
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
 
-    // Sync salesforce data every 2hrs
+    // Sync salesforce data every 2mins
     cron.schedule('*/2 * * * *', async () => {
       try {
         await syncDatabaseAndSalesforce()
       } catch (error) {
         console.error('Error during scheduled synchronization:', error)
+      }
+    })
+
+    cron.schedule('*/2 * * * *', async () => {
+      try {
+        await handleParentToChildren()
+      } catch (error) {
+        console.error('Error during scheduled pelationship update:', error)
       }
     })
 

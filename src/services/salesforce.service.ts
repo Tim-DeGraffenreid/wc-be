@@ -222,6 +222,27 @@ export const getDataFromSalesforce = async () => {
   }
 }
 
+export const handleParentToChildren = async () => {
+  try {
+    const data = await prisma.parent.findMany({ include: { student: true } })
+
+    data.forEach((parent) => {
+      parent.student.forEach((child) => {
+        apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
+          npe4__Contact__c: parent.salesforceId,
+          npe4__RelatedContact__c: child.salesforceId,
+          npe4__Type__c: 'Parent',
+        })
+      })
+    })
+
+    console.log('Parent relationship with children updated successfully')
+    return
+  } catch (error) {
+    console.error('Error saving relationship to salesforce:', error)
+  }
+}
+
 const GradeLevel = {
   First: '1st',
   Second: '2nd',
@@ -269,137 +290,6 @@ const HousingStatus = {
   Own: 'Own',
   CurrentlyDisplaced: 'Currently Displaced',
 }
-
-// testing
-
-// // Function to add a new Contact in Salesforce
-// export const addContact = async (contactData: any) => {
-// try {
-//     const response = await apiClient.post(
-//       '/services/data/v52.0/sobjects/Contact',
-//       contactData
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Contact creation failed:', error)
-//     throw error
-//   }
-// }
-
-// export const updateStudent = async (contactId: string, contactData: any) => {
-//   try {
-//     const response = await apiClient.patch(
-//       `/services/data/v52.0/sobjects/Contact/${contactId}`,
-//       contactData
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Contact update failed:', error)
-//     throw error
-//   }
-// }
-
-// // Function to update a Contact in Salesforce
-// export const updateContact = async (contactId: string, contactData: any) => {
-//   try {
-//     const response = await apiClient.patch(
-//       `/services/data/v52.0/sobjects/Contact/${contactId}`,
-//       contactData
-//     )
-//     return response.data
-//   } catch (error) {
-//     console.error('Contact update failed:', error)
-//     throw error
-//   }
-// }
-
-// //Function to add student and create relationship with parent and child
-// export const addStudent = async (compositeData: any) => {
-//   try {
-//     const response = await apiClient.post('/services/data/v58.0/composite', compositeData)
-//     return response.data
-//   } catch (error) {
-//     console.error('Add Student Failed: ', error)
-//     throw error
-//   }
-// }
-
-// export const getStudentDashboardData = async (email: string) => {
-//   try {
-//     const response = await apiClient.get(
-//       `/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName+FROM+Contact+WHERE+Email='${email}'`
-//     )
-//     return response
-//   } catch (error) {
-//     console.error('Getting Student Dashboard failed: ', error)
-//     throw error
-//   }
-// }
-
-// export const getDashboardData = async (email: string) => {
-//   const json = {
-//     allOrNone: false,
-//     collateSubrequests: false,
-//     compositeRequest: [
-//       {
-//         method: 'GET',
-//         url: `/services/data/v58.0/sobjects/Contact/Email/${email}?fields=Id,FirstName,LastName`,
-//         referenceId: 'refContact',
-//       },
-//       {
-//         method: 'GET',
-//         referenceId: 'refStudents',
-//         url: "/services/data/v58.0/query?q=SELECT+Id,FirstName+FROM+Contact+WHERE+Id+IN+(SELECT+npe4__Contact__c+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='@{refContact.Id}')",
-//       },
-//     ],
-//   }
-//   try {
-//     const response = await apiClient.post('/services/data/v58.0/composite', json)
-//     const { data } = response
-//     return data
-//   } catch (error) {
-//     console.log('Fetching dashboard data failed:', error)
-//     throw error
-//   }
-// }
-// export const getStudents = async (email: string) => {
-//   const compositeJSON = {
-//     allOrNone: false, //Set to false so even if subrequests fail, we still get the parent id
-//     collateSubrequests: false,
-//     compositeRequest: [
-//       {
-//         method: 'GET',
-//         url: `/services/data/v58.0/sobjects/Contact/Email/${email}?fields=Id`,
-//         referenceId: 'refContact',
-//       },
-//       {
-//         method: 'GET',
-//         referenceId: 'refStudents',
-//         url: "/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName,MobilePhone,Name,Email,Birthdate,Grade__c,School__c,Gender__c,MailingPostalCode,Emergency_Contact__c+FROM+Contact+WHERE+Id+IN+(SELECT+npe4__Contact__c+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='@{refContact.Id}')",
-//       },
-//     ],
-//   }
-
-//   try {
-//     const response = await apiClient.post('/services/data/v58.0/composite', compositeJSON)
-//     return response.data
-//   } catch (error) {
-//     console.error('Fetching contact and related students failed:', error)
-//     throw error
-//   }
-// }
-
-// export const testing_updateStudent = async () => {
-//   try {
-//     const response = await apiClient.get(
-//       '/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName+FROM+Contact+WHERE+FirstName=Tim'
-//     )
-
-//     return response.data
-//   } catch (error) {
-//     console.error('Encountered Error:', error)
-//   }
-// }
 
 // export default apiClient
 export const getStudentId = async () => {
