@@ -118,12 +118,9 @@ export const updateStudentSalesforce = async (id: string, student: student) => {
       MailingPostalCode: student.zipCode,
     }
 
-    const response = await apiClient.patch(
-      `/services/data/v52.0/sobjects/Contact/${id}`,
-      data
-    )
+    await apiClient.patch(`/services/data/v52.0/sobjects/Contact/${id}`, data)
 
-    return response.data
+    return 'successfully updated'
   } catch (error) {
     console.error('Update of student to salesforce failed:', error)
     throw error
@@ -144,12 +141,9 @@ export const updateParentSalesforce = async (id: string, parent: parent) => {
       Do_you_have_regular_transportation__c: parent.regularTransportation ? 'Yes' : 'No',
       Residence_Type__c: HousingStatus[parent.housingStatus],
     }
-    const response = await apiClient.patch(
-      `/services/data/v52.0/sobjects/Contact/${id}`,
-      data
-    )
+    await apiClient.patch(`/services/data/v52.0/sobjects/Contact/${id}`, data)
 
-    return response.data
+    return 'successfully updated'
   } catch (error) {
     console.error('Update of student to salesforce failed:', error)
     throw error
