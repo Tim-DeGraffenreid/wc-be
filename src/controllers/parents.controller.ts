@@ -13,7 +13,11 @@ import {
   updateParent,
 } from '../services/parents.service'
 import { findClassById } from '../services/class.service'
-import { addStudentToSalesforce, deleteUser } from '../services/salesforce.service'
+import {
+  addStudentToSalesforce,
+  deleteUser,
+  updateParentSalesforce,
+} from '../services/salesforce.service'
 
 /**
  * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
@@ -167,11 +171,13 @@ export const updateParentsHandler = async (
     }
 
     parent = await updateParent(parent, req.body)
-
-    res.status(200).json({
-      status: 'success',
-      data: parent,
-    })
+    const salesforce = await updateParentSalesforce(parent.salesforceId, parent)
+    if (salesforce) {
+      res.status(200).json({
+        status: 'success',
+        data: parent,
+      })
+    }
   } catch (error) {
     next(error)
   }

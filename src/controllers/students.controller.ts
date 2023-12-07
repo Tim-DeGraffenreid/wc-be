@@ -10,7 +10,7 @@ import {
 } from '../services/students.service'
 import AppError from '../utils/appError'
 import { findClassById } from '../services/class.service'
-import { deleteUser } from '../services/salesforce.service'
+import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -104,11 +104,13 @@ export const updateStudentHandler = async (
     }
 
     student = await updateStudent(student, req.body)
-
-    res.status(200).json({
-      status: 'success',
-      data: student,
-    })
+    const salesforce = await updateStudentSalesforce(student.salesforceId, student)
+    if (salesforce) {
+      res.status(200).json({
+        status: 'success',
+        data: student,
+      })
+    }
   } catch (error) {
     next(error)
   }
