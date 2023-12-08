@@ -96,7 +96,7 @@ export const deleteParentHandler = async (
       return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    const deleteFromSalesforce = await deleteUser(id)
+    const deleteFromSalesforce = await deleteUser(parent.salesforceId)
 
     if (deleteFromSalesforce) {
       await deleteParent(id)
