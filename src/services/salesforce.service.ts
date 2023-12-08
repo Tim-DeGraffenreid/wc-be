@@ -208,6 +208,8 @@ export const handleParentToChildren = async () => {
     const data = await prisma.parent.findMany({ include: { student: true } })
     const existingRelationships = await getRelationshipsFromSalesforce()
 
+    console.log(existingRelationships)
+
     data.forEach(async (parent) => {
       for (const child of parent.student) {
         // Check if the relationship already exists
@@ -240,7 +242,7 @@ const getDataFromSalesforce = async () => {
     const response = await apiClient.get(
       `/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName,Email,CreatedDate,Parent_or_Student__c,Phone,BirthDate,Grade__c,School__c,Gender__c,MailingPostalCode,Education_Level__c,Veteran_Status__c,Do_you_have_regular_transportation__c,Residence_Type__c+FROM+Contact`
     )
-    return response.data?.records
+    return response.data
   } catch (error) {
     console.error('Error fetching data from salesforce:', error)
     throw error
@@ -253,7 +255,7 @@ const getRelationshipsFromSalesforce = async () => {
       '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c+FROM+npe4__Relationship__c'
     )
 
-    return response.data
+    return response.data?.records
   } catch (error) {
     throw error
   }
