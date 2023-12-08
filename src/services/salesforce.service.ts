@@ -196,7 +196,6 @@ export const syncDatabaseAndSalesforce = async () => {
       }
     })
 
-    console.log('Salesforce successfully synced to database')
     return
   } catch (error) {
     console.error('Error while syncing', error)
@@ -204,36 +203,59 @@ export const syncDatabaseAndSalesforce = async () => {
   }
 }
 
-export const getDataFromSalesforce = async () => {
+export const handleParentToChildren = async () => {
+  try {
+    const data = await prisma.parent.findMany({ include: { student: true } })
+    const existingRelationships = await getRelationshipsFromSalesforce()
+
+    data.forEach(async (parent) => {
+      for (const child of parent.student) {
+        // Check if the relationship already exists
+        const isExistingRelationship = existingRelationships.some(
+          (relationship: any) =>
+            relationship.npe4__Contact__c === parent.salesforceId &&
+            relationship.npe4__RelatedContact__c === child.salesforceId &&
+            relationship.npe4__Type__c === 'Parent'
+        )
+
+        if (!isExistingRelationship) {
+          // If the relationship doesn't exist, add a new one
+          await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
+            npe4__Contact__c: parent.salesforceId,
+            npe4__RelatedContact__c: child.salesforceId,
+            npe4__Type__c: 'Parent',
+          })
+        }
+      }
+    })
+
+    return
+  } catch (error) {
+    console.error('Error saving relationship to Salesforce:', error)
+  }
+}
+
+const getDataFromSalesforce = async () => {
   try {
     const response = await apiClient.get(
       `/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName,Email,CreatedDate,Parent_or_Student__c,Phone,BirthDate,Grade__c,School__c,Gender__c,MailingPostalCode,Education_Level__c,Veteran_Status__c,Do_you_have_regular_transportation__c,Residence_Type__c+FROM+Contact`
     )
-    return response.data
+    return response.data?.records
   } catch (error) {
     console.error('Error fetching data from salesforce:', error)
     throw error
   }
 }
 
-export const handleParentToChildren = async () => {
+const getRelationshipsFromSalesforce = async () => {
   try {
-    const data = await prisma.parent.findMany({ include: { student: true } })
+    const response = await apiClient.get(
+      '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c+FROM+npe4__Relationship__c'
+    )
 
-    data.forEach((parent) => {
-      parent.student.forEach((child) => {
-        apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
-          npe4__Contact__c: parent.salesforceId,
-          npe4__RelatedContact__c: child.salesforceId,
-          npe4__Type__c: 'Parent',
-        })
-      })
-    })
-
-    console.log('Parent relationship with children updated successfully')
-    return
+    return response.data
   } catch (error) {
-    console.error('Error saving relationship to salesforce:', error)
+    throw error
   }
 }
 

@@ -72,7 +72,7 @@ export const deleteStudentHandler = async (
   try {
     const { id } = req.params
     const student = await findStudentById(id)
-    const deleteFromSalesforce = await deleteUser(id)
+    const deleteFromSalesforce = await deleteUser(student.salesforceId)
 
     if (deleteFromSalesforce) {
       if (!student) {

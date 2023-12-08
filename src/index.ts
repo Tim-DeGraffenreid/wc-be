@@ -55,7 +55,7 @@ connectRedis()
       }
     })
 
-    app.get('/api/healthChecker', async (req: Request, res: Response) => {
+    app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')
 
       res.status(200).json({
@@ -64,11 +64,11 @@ connectRedis()
       })
     })
 
-    app.all('*', (req: Request, res: Response, next: NextFunction) => {
+    app.all('*', (req: Request, _res: Response, next: NextFunction) => {
       next(new AppError(404, `Route ${req.originalUrl} not found`))
     })
 
-    app.use((error: AppError, req: Request, res: Response, next: NextFunction) => {
+    app.use((error: AppError, _req: Request, res: Response, _next: NextFunction) => {
       error.status = error.status || 'error'
       error.statusCode = error.statusCode || 500
 
