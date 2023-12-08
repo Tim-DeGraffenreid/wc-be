@@ -208,8 +208,6 @@ export const handleParentToChildren = async () => {
     const data = await prisma.parent.findMany({ include: { student: true } })
     const existingRelationships = await getRelationshipsFromSalesforce()
 
-    console.log(existingRelationships)
-
     data.forEach(async (parent) => {
       for (const child of parent.student) {
         // Check if the relationship already exists
