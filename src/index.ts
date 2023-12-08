@@ -47,13 +47,13 @@ connectRedis()
       }
     })
 
-    cron.schedule('*/2 * * * *', async () => {
-      try {
-        await handleParentToChildren()
-      } catch (error) {
-        console.error('Error during scheduled pelationship update:', error)
-      }
-    })
+    // cron.schedule('*/2 * * * *', async () => {
+    //   try {
+    await handleParentToChildren()
+    //   } catch (error) {
+    //     console.error('Error during scheduled pelationship update:', error)
+    //   }
+    // })
 
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')
