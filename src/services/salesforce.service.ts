@@ -218,8 +218,6 @@ export const handleParentToChildren = async () => {
             relationship.npe4__Type__c === 'Parent'
         )
 
-        console.log(isExistingRelationship)
-
         if (!isExistingRelationship) {
           // If the relationship doesn't exist, add a new one
           await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
