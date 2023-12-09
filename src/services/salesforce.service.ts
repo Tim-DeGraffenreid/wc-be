@@ -252,7 +252,7 @@ const getDataFromSalesforce = async () => {
 const getRelationshipsFromSalesforce = async () => {
   try {
     const response = await apiClient.get(
-      '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c+FROM+npe4__Relationship__c'
+      '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c,npe4__Type__c+FROM+npe4__Relationship__c'
     )
 
     return response.data?.records
