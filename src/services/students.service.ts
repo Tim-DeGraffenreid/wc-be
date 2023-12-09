@@ -3,7 +3,7 @@ import prisma from '../utils/prisma'
 import { student } from '@prisma/client'
 
 export const getStudents = async () => {
-  return await prisma.student.findMany()
+  return await prisma.student.findMany({ include: { knowledge: true } })
 }
 
 export const createStudent = async (data: student) => {
