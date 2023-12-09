@@ -225,10 +225,12 @@ export const handleParentToChildren = async () => {
             npe4__RelatedContact__c: child.salesforceId,
             npe4__Type__c: 'Parent',
           })
+
+          console.log('Added relationship to parent successfully')
         }
       }
     })
-
+    console.log('first')
     return
   } catch (error) {
     console.error('Error saving relationship to Salesforce:', error)
