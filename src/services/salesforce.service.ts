@@ -214,7 +214,8 @@ export const handleParentToChildren = async () => {
         const isExistingRelationship = existingRelationships.some(
           (relationship: any) =>
             relationship.npe4__Contact__c === parent.salesforceId &&
-            relationship.npe4__RelatedContact__c === child.salesforceId
+            relationship.npe4__RelatedContact__c === child.salesforceId &&
+            relationship.npe4__Type__c === 'Parent'
         )
 
         console.log(isExistingRelationship)
