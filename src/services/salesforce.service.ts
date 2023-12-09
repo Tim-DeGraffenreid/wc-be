@@ -214,9 +214,10 @@ export const handleParentToChildren = async () => {
         const isExistingRelationship = existingRelationships.some(
           (relationship: any) =>
             relationship.npe4__Contact__c === parent.salesforceId &&
-            relationship.npe4__RelatedContact__c === child.salesforceId &&
-            relationship.npe4__Type__c === 'Parent'
+            relationship.npe4__RelatedContact__c === child.salesforceId
         )
+
+        console.log(isExistingRelationship)
 
         if (!isExistingRelationship) {
           // If the relationship doesn't exist, add a new one
@@ -252,7 +253,7 @@ const getDataFromSalesforce = async () => {
 const getRelationshipsFromSalesforce = async () => {
   try {
     const response = await apiClient.get(
-      '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c+FROM+npe4__Relationship__c'
+      '/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c,npe4__Type__c+FROM+npe4__Relationship__c'
     )
 
     return response.data?.records
