@@ -17,7 +17,7 @@ export const parentSchema: AnyZodObject = object({
     password: string({ required_error: 'password is required' }).min(8),
     fName: string({ required_error: 'fName is required' }),
     lName: string({ required_error: 'lName is required' }),
-    phoneNumber: string({ required_error: 'phoneNumber is required' }).regex(/^\d{10}$/),
+    phoneNumber: string(),
     birthday: string({
       required_error: 'birthday is required',
     }).regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -60,7 +60,7 @@ export const updateParentSchema = object({
     password: string({ required_error: 'password is required' }).min(8),
     fName: string({ required_error: 'fName is required' }),
     lName: string({ required_error: 'lName is required' }),
-    phoneNumber: string({ required_error: 'phoneNumber is required' }).regex(/^\d{10}$/),
+    phoneNumber: string(),
     birthday: string({
       required_error: 'birthday is required',
     }).regex(/^\d{4}-\d{2}-\d{2}$/),
