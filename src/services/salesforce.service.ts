@@ -213,16 +213,15 @@ export const handleParentToChildren = async () => {
         // Check if the relationship already exists
         const isExistingRelationship = existingRelationships.some(
           (relationship: any) =>
-            relationship.npe4__Contact__c === parent.salesforceId &&
-            relationship.npe4__RelatedContact__c === child.salesforceId &&
+            relationship.npe4__Contact__c === child.salesforceId &&
+            relationship.npe4__RelatedContact__c === parent.salesforceId &&
             relationship.npe4__Type__c === 'Parent'
         )
 
         if (!isExistingRelationship) {
-          // If the relationship doesn't exist, add a new one
           await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
-            npe4__Contact__c: parent.salesforceId,
-            npe4__RelatedContact__c: child.salesforceId,
+            npe4__Contact__c: child.salesforceId,
+            npe4__RelatedContact__c: parent.salesforceId,
             npe4__Type__c: 'Parent',
           })
 
