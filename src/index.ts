@@ -47,11 +47,11 @@ connectRedis()
       }
     })
 
-    cron.schedule('*/2 * * * *', async () => {
+    cron.schedule('*/1 * * * *', async () => {
       try {
         await handleParentToChildren()
       } catch (error) {
-        console.error('Error during scheduled pelationship update:', error)
+        console.error('Error during scheduled relationship update:', error)
       }
     })
 
