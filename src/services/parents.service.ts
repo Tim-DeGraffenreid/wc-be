@@ -26,6 +26,7 @@ export const findParentById = async (userId: string) => {
 
 export const createNewStudent = async (studentData: student, parentId: string) => {
   studentData.birthday = new Date(studentData.birthday)
+  studentData.password = await hashPassword(studentData.password)
   const student = await prisma.student.create({
     data: {
       ...studentData,

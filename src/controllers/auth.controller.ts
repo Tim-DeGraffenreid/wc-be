@@ -131,6 +131,8 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       })
     }
 
+    console.log(user)
+
     if (!user || !(await comparePasswords(password, user.password))) {
       return next(new AppError(400, 'Invalid email or password'))
     }
