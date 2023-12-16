@@ -57,6 +57,7 @@ export const addStudentToSalesforce = async (student: student) => {
       School__c: student.schoolName,
       Gender__c: Gender[student.gender],
       MailingPostalCode: student.zipCode,
+      Emergency_Contact__c: student.emergencyContact,
     }
     const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
@@ -116,6 +117,7 @@ export const updateStudentSalesforce = async (id: string, student: student) => {
       School__c: student.schoolName,
       Gender__c: Gender[student.gender],
       MailingPostalCode: student.zipCode,
+      Emergency_Contact__c: student.emergencyContact,
     }
 
     await apiClient.patch(`/services/data/v52.0/sobjects/Contact/${id}`, data)

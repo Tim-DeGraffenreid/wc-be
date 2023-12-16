@@ -15,6 +15,7 @@ export const studentSchema = object({
     schoolName: string({ required_error: 'schoolName is required' }),
     gender: nativeEnum(student_gender_enum),
     zipCode: string({ required_error: 'zipCode is required' }).regex(/^\d{5}$/),
+    emergencyContact: string().optional(),
   }),
 })
 
@@ -52,6 +53,7 @@ export const updateStudentSchema = object({
     schoolName: string({ required_error: 'schoolName is required' }),
     gender: nativeEnum(student_gender_enum),
     zipCode: string({ required_error: 'zipCode is required' }).regex(/^\d{5}$/),
+    emergencyContact: string().optional(),
   }).partial(),
 })
 
