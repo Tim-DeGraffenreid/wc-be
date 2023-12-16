@@ -118,7 +118,7 @@ export const changeParentPassword = async (email: string, password: string) => {
 
   if (parent) {
     parent.password = await hashPassword(password)
-    await prisma.student.update({
+    await prisma.parent.update({
       where: { id: parent.id },
       data: { password: parent.password },
     })
