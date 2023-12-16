@@ -72,7 +72,10 @@ export const findStudentByDetails = async (data: any) => {
 
   if (response) {
     response.password = await hashPassword(password)
-    await prisma.student.update({ where: { id: response.id }, data: { ...response } })
+    await prisma.student.update({
+      where: { id: response.id },
+      data: { password: response.password },
+    })
     return response
   }
 }
