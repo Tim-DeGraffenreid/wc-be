@@ -117,8 +117,11 @@ export const changeParentPassword = async (email: string, password: string) => {
   const parent = await prisma.parent.findUnique({ where: { email } })
 
   if (parent) {
-    parent.password = password
-
+    parent.password = await hashPassword(password)
+    await prisma.student.update({
+      where: { id: parent.id },
+      data: { password: parent.password },
+    })
     return parent
   }
 }
