@@ -115,6 +115,7 @@ export const addChildToClass = async (student: student, classId: string) => {
 
 export const changeParentPassword = async (email: string, password: string) => {
   const parent = await prisma.parent.findUnique({ where: { email } })
+  console.log(parent)
 
   if (parent) {
     parent.password = await hashPassword(password)

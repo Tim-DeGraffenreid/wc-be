@@ -1,6 +1,10 @@
 import { CookieOptions, NextFunction, Request, Response } from 'express'
 import AppError from '../utils/appError'
-import { createParent, findParentByEmail } from '../services/parents.service'
+import {
+  changeParentPassword,
+  createParent,
+  findParentByEmail,
+} from '../services/parents.service'
 import { signTokens } from '../services/auth.service'
 import { createStudent, findStudentByDetails } from '../services/students.service'
 import { comparePasswords } from '../utils/password.manager'
@@ -184,7 +188,7 @@ export const forgotPasswordHandler = async (
     if (userType === 'student') {
       results = await findStudentByDetails(rest)
     } else if (userType === 'parent') {
-      results = await findParentByEmail({ email })
+      results = await changeParentPassword(email, rest?.password)
     }
 
     if (!results) {
