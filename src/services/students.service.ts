@@ -1,19 +1,34 @@
 import { hashPassword } from '../utils/password.manager'
 import prisma from '../utils/prisma'
-import { student } from '@prisma/client'
+import { Prisma, student } from '@prisma/client'
 
 export const getStudents = async () => {
   return await prisma.student.findMany({ include: { knowledge: true } })
 }
 
 export const createStudent = async (data: student) => {
-  data.password = await hashPassword(data.password)
-  data.birthday = new Date(data.birthday)
-  return await prisma.student.create({
-    data: {
-      ...data,
-    },
-  })
+  try {
+    data.password = await hashPassword(data.password)
+    data.birthday = new Date(data.birthday)
+    const student = await prisma.student.create({
+      data: {
+        ...data,
+      },
+    })
+    return { success: true, data: student }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return { success: false, message: 'Email or username is already in use.' }
+      }
+      // Add more cases as needed
+    } else if (error instanceof Prisma.PrismaClientValidationError) {
+      return { success: false, message: 'Invalid data provided for creating a parent.' }
+    } else {
+      console.error('Error creating parent:', error)
+      return { success: false, message: 'An error occurred while creating the parent.' }
+    }
+  }
 }
 
 export const findStudentByEmail = async ({ email }: { email: string }) => {
