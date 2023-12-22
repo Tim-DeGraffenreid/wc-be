@@ -6,15 +6,39 @@ export const getParents = async () => {
   return await prisma.parent.findMany()
 }
 
-export const createParent = async (data: Prisma.parentCreateInput) => {
-  data.password = await hashPassword(data.password)
-  data.birthday = new Date(data.birthday)
-  const parent = await prisma.parent.create({
-    data,
-  })
+// export const createParent = async (data: Prisma.parentCreateInput) => {
+//   data.password = await hashPassword(data.password)
+//   data.birthday = new Date(data.birthday)
+//   const parent = await prisma.parent.create({
+//     data,
+//   })
 
-  return parent
-}
+//   return parent
+// }
+export const createParent = async (data: Prisma.parentCreateInput) => {
+  try {
+    data.password = await hashPassword(data.password);
+    data.birthday = new Date(data.birthday);
+
+    const parent = await prisma.parent.create({
+      data,
+    });
+
+    return { success: true, data: parent };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        return { success: false, message: 'Email or username is already in use.' };
+      }
+      // Add more cases as needed
+    } else if (error instanceof Prisma.PrismaClientValidationError) {
+      return { success: false, message: 'Invalid data provided for creating a parent.' };
+    } else {
+      console.error('Error creating parent:', error);
+      return { success: false, message: 'An error occurred while creating the parent.' };
+    }
+  }
+};
 
 export const findParentByEmail = async ({ email }: { email: string }) => {
   return await prisma.parent.findFirst({ where: { email } })
@@ -115,8 +139,6 @@ export const addChildToClass = async (student: student, classId: string) => {
 
 export const changeParentPassword = async (email: string, password: string) => {
   const parent = await prisma.parent.findUnique({ where: { email } })
-  console.log(parent)
-
   if (parent) {
     parent.password = await hashPassword(password)
     await prisma.parent.update({

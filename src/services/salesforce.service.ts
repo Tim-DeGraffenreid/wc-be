@@ -83,10 +83,7 @@ export const addParentToSalesforce = async (parent: parent) => {
       Residence_Type__c: HousingStatus[parent.housingStatus],
     }
 
-    console.log(data)
     const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
-
-    console.log(response.data)
 
     return response.data
   } catch (error: any) {
@@ -231,7 +228,7 @@ export const handleParentToChildren = async () => {
         }
       }
     })
-    console.log('first')
+    console.log('Finished adding relationships to parents')
     return
   } catch (error) {
     console.error('Error saving relationship to Salesforce:', error)
