@@ -165,18 +165,18 @@ export const registerStudent = async (
       }
     }
   } catch (error: any) {
-    if (error?.code === 'P2002' && error.meta?.target?.includes('email')) {
-      // Unique constraint violation on email field
-      return res.status(409).json({
-        status: 'fail',
-        message: 'Email address is already in use.',
-      })
-    }
+    // if (error?.code === 'P2002' && error.meta?.target?.includes('email')) {
+    //   // Unique constraint violation on email field
+    //   return res.status(409).json({
+    //     status: 'fail',
+    //     message: 'Email address is already in use.',
+    //   })
+    // }
 
     console.error('Unexpected Error:', error)
     res.status(500).json({
       status: 'error',
-      message: 'An unexpected error occurred.',
+      message: error ? error : 'An unexpected error occurred.',
     })
   }
 }
