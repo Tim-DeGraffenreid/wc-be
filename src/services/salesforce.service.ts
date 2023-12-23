@@ -47,7 +47,7 @@ apiClient.interceptors.request.use(async (config) => {
 export const addStudentToSalesforce = async (student: student) => {
   try {
     const data = {
-      Parent_or_Student__c: 'student',
+      Parent_or_Student__c: 'student', //this indicates whether a student or not, right?
       Email: student.email,
       LastName: student.lName,
       FirstName: student.fName,
@@ -59,11 +59,21 @@ export const addStudentToSalesforce = async (student: student) => {
       MailingPostalCode: student.zipCode,
       Emergency_Contact__c: student.emergencyContact,
     }
-    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
+    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data) // and this is the common endpoint
 
     return response.data
-  } catch (error) {
-    console.error('Creation of student to salesforce failed:', error)
+  } catch (error: any) {
+    console.error('Creation of Student to salesforce failed:', error)
+
+    if (error.response) {
+      console.error('Response error:', error.response.data[0]?.errorCode)
+
+      throw error.response.data[0]?.errorCode
+    } else if (error.request) {
+      console.error('No response received:', error.request)
+    } else {
+      console.error('Request setup error:', error.message)
+    }
     throw error
   }
 }
