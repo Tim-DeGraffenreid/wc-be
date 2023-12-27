@@ -306,7 +306,7 @@ const EducationLevel = {
 const VeteranStatus = {
   NotAVeteran: 'I am not a veteran',
   BelongToSeveralClassifications:
-    'I belong to several classifications of protected veterans',
+    'I belong to one of the several classifications of protected veterans',
   NotProtectedVeteran: 'I am NOT a protected veteran',
   ChooseNotToIdentify: 'I choose not to identify my veteran status',
 }
