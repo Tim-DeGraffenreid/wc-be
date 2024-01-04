@@ -18,6 +18,8 @@ import {
   deleteUser,
   updateParentSalesforce,
 } from '../services/salesforce.service'
+import { findStudentById, updateStudent } from '../services/students.service'
+import { uploadImage } from '../services/cloudinary.service'
 
 export const getParentsHandler = async (
   req: Request,
@@ -215,6 +217,35 @@ export const addChildToClassHandler = async (
     res.status(201).json({
       status: 'success',
       message: 'Student added to class successfully',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const addChildImageHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { studentId } = req.params
+    const image = req.file as Express.Multer.File
+
+    if (!image) {
+      return next(new AppError(400, 'No image provided'))
+    }
+
+    const student = await findStudentById(studentId)
+
+    if (!student) {
+      return next(new AppError(404, 'Student with id does not exist'))
+    }
+
+    const { public_id, secure_url } = await uploadImage(req.file?.buffer!)
+    const updatedStudent = await updateStudent(student, {
+      profileImagePublicId: public_id,
+      profileImageSecureUrl: secure_url,
+    })
+    res.status(200).json({
+      status: 'success',
+      data: updatedStudent,
     })
   } catch (error) {
     next(error)
