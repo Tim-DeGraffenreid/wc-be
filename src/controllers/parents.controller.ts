@@ -19,19 +19,6 @@ import {
   updateParentSalesforce,
 } from '../services/salesforce.service'
 
-/**
- * The below function is an asynchronous handler that retrieves a list of parents and sends a JSON
- * response with the parents.
- * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
- * information about the incoming request such as the request headers, query parameters, and request
- * body.
- * @param {Response} res - The `res` parameter is the response object that is used to send the response
- * back to the client. It contains methods and properties that allow you to set the response status,
- * headers, and body. In this code snippet, `res.status(200)` sets the response status code to 200 (
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function after the current one has completed its task.
- */
 export const getParentsHandler = async (
   req: Request,
   res: Response,
@@ -48,19 +35,6 @@ export const getParentsHandler = async (
   }
 }
 
-/**
- * The `getParentHandler` function is an asynchronous function that retrieves a parent object by its ID
- * and sends a JSON response with the parent data if it exists, or throws an error if it doesn't.
- * @param {Request} req - The `req` parameter represents the HTTP request object, which contains
- * information about the incoming request such as headers, query parameters, and request body.
- * @param {Response} res - The `res` parameter is the response object that is used to send the response
- * back to the client. It contains methods and properties that allow you to set the response status,
- * headers, and body. In this code snippet, `res.status(200)` is used to set the response status to
- * @param {NextFunction} next - The `next` parameter is a function that is used to pass control to the
- * next middleware function in the request-response cycle. It is typically used to handle errors or to
- * move on to the next middleware function in the chain.
- * @returns a JSON response with a status of "success" and the data of the parent object.
- */
 export const getParentHandler = async (
   req: Request,
   res: Response,
@@ -81,9 +55,6 @@ export const getParentHandler = async (
   }
 }
 
-/* The `deleteParentHandler` function is an asynchronous function that handles the deletion of a parent
-record. It takes in three parameters: `req` (the request object), `res` (the response object), and
-`next` (a function to pass control to the next middleware function). */
 export const deleteParentHandler = async (
   req: Request,
   res: Response,
