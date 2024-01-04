@@ -11,6 +11,7 @@ import {
 import AppError from '../utils/appError'
 import { findClassById } from '../services/class.service'
 import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
+import { uploadImage } from '../services/cloudinary.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -153,6 +154,39 @@ export const getStudentClassHandler = async (
     res.status(200).json({
       status: 'success',
       classes,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const updateStudentImageHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = res.locals.user
+    const image = req.file as Express.Multer.File
+
+    if (!image) {
+      return next(new AppError(400, 'No image provided'))
+    }
+
+    const student = await findStudentById(id)
+
+    if (!student) {
+      return next(new AppError(404, 'Student with id does not exist'))
+    }
+
+    const { public_id, secure_url } = await uploadImage(req.file?.buffer!)
+    const updatedStudent = await updateStudent(student, {
+      profileImagePublicId: public_id,
+      profileImageSecureUrl: secure_url,
+    })
+    res.status(200).json({
+      status: 'success',
+      data: updatedStudent,
     })
   } catch (error) {
     next(error)

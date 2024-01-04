@@ -20,6 +20,7 @@ import {
 import { studentSchema } from '../schemas/student.schema'
 import { requireUser } from '../middlewares/requireUser'
 import { deserializeUser } from '../middlewares/deserializeUser'
+import upload from '../middlewares/multer'
 
 const router = express.Router()
 
@@ -51,5 +52,7 @@ router
 router
   .route('/add-to-class/:studentId/:classId')
   .post(deserializeUser, requireUser, addChildToClassHandler)
+// router.route('/:studentId/image').post(deserializeUser, requireUser, upload.single('profile'))
+
 
 export default router

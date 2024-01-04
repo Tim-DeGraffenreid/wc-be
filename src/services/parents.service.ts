@@ -6,15 +6,6 @@ export const getParents = async () => {
   return await prisma.parent.findMany()
 }
 
-// export const createParent = async (data: Prisma.parentCreateInput) => {
-//   data.password = await hashPassword(data.password)
-//   data.birthday = new Date(data.birthday)
-//   const parent = await prisma.parent.create({
-//     data,
-//   })
-
-//   return parent
-// }
 export const createParent = async (data: Prisma.parentCreateInput) => {
   try {
     data.password = await hashPassword(data.password);
