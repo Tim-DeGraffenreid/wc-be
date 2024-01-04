@@ -1,5 +1,6 @@
 import express from 'express'
 import {
+  addChildImageHandler,
   addChildToClassHandler,
   addDemographicHandler,
   addStudentsHandler,
@@ -34,13 +35,7 @@ router
     requireUser,
     addDemographicHandler
   )
-router
-  .route('/demographic')
-  .get(
-    deserializeUser,
-    requireUser,
-    getDemographicHandler
-  )
+router.route('/demographic').get(deserializeUser, requireUser, getDemographicHandler)
 router
   .route('/:id')
   .get(validate(getParentSchema), getParentHandler)
@@ -52,7 +47,8 @@ router
 router
   .route('/add-to-class/:studentId/:classId')
   .post(deserializeUser, requireUser, addChildToClassHandler)
-// router.route('/:studentId/image').post(deserializeUser, requireUser, upload.single('profile'))
-
+router
+  .route('/:studentId/image')
+  .post(deserializeUser, requireUser, upload.single('profile'), addChildImageHandler)
 
 export default router
