@@ -3,12 +3,11 @@ import axios from 'axios'
 import prisma from '../utils/prisma'
 // //FixThis: Put these in vercel environment variables when you switch out of
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token' // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
-const clientId =
-  '3MVG9hz9IjkO5fmXfTXB7b8yqSriTKfV0s6_o7NY8LqV5QzqrAZfv1tr1R9lcGzhDTkuwhJeDtdCU4ABbyKTb' //  Salesforce client ID
-const clientSecret = '5D0CD956812C248B312C5FCCD6D748A038D41F90EEBA7B7BC319C3DAE076DFB3' // Salesforce client secret
-const username = 'timd061677@wecodekc.org.eventtest' // Salesforce username
-const password = 'T1i2m3d4@sf' //Salesforce password
-const securityToken = 'yz5NJ0qP3FanqJx0Awb8UqVJ3' //Salesforce security token
+const clientId = process.env.SFCLIENTID //  Salesforce client ID
+const clientSecret = process.env.SFCLIENTSECRET // Salesforce client secret
+const username = process.env.SFUSERNAME // Salesforce username
+const password = process.env.SFPASSWORD //Salesforce password
+const securityToken = process.env.SFSECURITYTOKEN //Salesforce security token
 
 // Function to obtain an access token using the Salesforce user-password flow
 const getAccessToken = async () => {
