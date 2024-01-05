@@ -238,7 +238,9 @@ export const addChildImageHandler = async (req: Request, res: Response, next: Ne
       return next(new AppError(404, 'Student with id does not exist'))
     }
 
-    const { public_id, secure_url } = await uploadImage(req.file?.buffer!)
+    const b64 = Buffer.from(image.buffer).toString("base64");
+    let dataURI = "data:" + image.mimetype + ";base64," + b64;
+    const { public_id, secure_url } = await uploadImage(dataURI)
     const updatedStudent = await updateStudent(student, {
       profileImagePublicId: public_id,
       profileImageSecureUrl: secure_url,

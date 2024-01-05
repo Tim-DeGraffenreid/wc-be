@@ -6,13 +6,11 @@ const config = {
   api_secret: process.env.CLOUDINARY_API_SECRET,
 }
 
-export const uploadImage = async (file: Buffer) => {
-  console.log(file)
+export const uploadImage = async (file: any) => {
   cloudinary.config(config)
   const result = await cloudinary.uploader.upload(file.toString(), {
     folder: 'we-codekc',
   })
-  console.log(`result: ${result}`)
 
   return { secure_url: result.secure_url, public_id: result.public_id }
 }
