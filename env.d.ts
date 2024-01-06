@@ -17,6 +17,12 @@ declare global {
       SFSECURITYTOKEN: string
       SFCLIENTID: string
       SFCLIENTSECRET: string
+      EMAIL_HOST: string
+      EMAIL_HOST_USER: string
+      EMAIL_HOST_PASSWORD: string
+      EMAIL_USE_TLS: boolean
+      EMAIL_PORT: number
+      DEFAULT_FROM_EMAIL: string
     }
   }
 }
