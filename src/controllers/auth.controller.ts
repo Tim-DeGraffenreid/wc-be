@@ -5,14 +5,21 @@ import {
   createParent,
   findParentByEmail,
 } from '../services/parents.service'
-import { signTokens } from '../services/auth.service'
-import { createStudent, findStudentByDetails } from '../services/students.service'
+import { generateVerifyEmailToken, signTokens } from '../services/auth.service'
+import {
+  createStudent,
+  findStudentByDetails,
+  findStudentByEmail,
+} from '../services/students.service'
 import { comparePasswords } from '../utils/password.manager'
 import prisma from '../utils/prisma'
 import {
   addParentToSalesforce,
   addStudentToSalesforce,
 } from '../services/salesforce.service'
+import { sendConfirmationEmail } from '../services/mail.service'
+import redisClient from '../utils/connectRedis'
+import { verifyJwt } from '../utils/jwt'
 
 const accessTokenExpiresInMinutes = Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
 if (isNaN(accessTokenExpiresInMinutes)) {
@@ -165,14 +172,6 @@ export const registerStudent = async (
       }
     }
   } catch (error: any) {
-    // if (error?.code === 'P2002' && error.meta?.target?.includes('email')) {
-    //   // Unique constraint violation on email field
-    //   return res.status(409).json({
-    //     status: 'fail',
-    //     message: 'Email address is already in use.',
-    //   })
-    // }
-
     console.error('Unexpected Error:', error)
     res.status(500).json({
       status: 'error',
@@ -259,6 +258,70 @@ export const forgotPasswordHandler = async (
     res.status(201).json({
       status: 'success',
       results,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const sendConfirmationEmailHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userType, email } = req.body
+    const session = await redisClient.get(email)
+
+    if (session) {
+      return next(new AppError(400, 'Email already sent'))
+    }
+
+    let results
+    if (userType === 'parent') {
+      results = await findParentByEmail({ email })
+    } else if (userType === 'student') {
+      results = await findStudentByEmail({ email })
+    }
+
+    console.log(results)
+    if (results) {
+      return next(new AppError(400, 'Email already exists'))
+    }
+
+    const { token } = await generateVerifyEmailToken(email)
+    sendConfirmationEmail(email, token!)
+
+    res.status(201).json({
+      status: 'success',
+      message: 'Email sent',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const verifyEmailHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { token } = req.body
+    const decoded = verifyJwt<{ sub: string }>(token)
+    if (!decoded) {
+      return next(new AppError(400, 'Invalid token'))
+    }
+
+    const session = await redisClient.get(decoded.sub)
+
+    if (!session) {
+      return next(new AppError(401, `Invalid token or session has expired`))
+    }
+
+    res.status(200).json({
+      status: 'success',
+      email: { ...JSON.parse(session) },
     })
   } catch (error) {
     next(error)
