@@ -176,14 +176,20 @@ const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
   try {
     const url =
       type === 'parent'
-        ? `/services/data/v58.0/query?q=DELETE+*+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c=${id}`
-        : `/services/data/v58.0/query?q=DELETE+*+FROM+npe4__Relationship__c+WHERE+npe4__Contact__c=${id}`
-    const response = await apiClient.delete(url)
+        ? `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='${id}'+limit 1`
+        : `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__Contact__c='${id}'+limit 1`
+    const response = await apiClient.get(url)
 
-    console.log(response.data)
-    return true
+    const records = response.data?.records
+
+    records.forEach(async (record: any) => {
+      await apiClient.delete(
+        `/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`
+      )
+    })
+    console.log('Deleted relationships successfully')
   } catch (error) {
-    console.error('Deletion of salesforce relationship failed:', error)
+    console.log(`Error deleting relationships: ${error}`)
     throw error
   }
 }
@@ -346,3 +352,23 @@ export const getStudentId = async () => {
     console.error('Encountered Error:', error)
   }
 }
+
+// // Testing
+// export const testSalesforceRelationship = async (id = '003DC00000S96ckYAB') => {
+//   try {
+//     const response = await apiClient.get(
+//       `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='${id}'+limit 1`
+//     )
+
+//     const records = response.data?.records
+
+//     records.forEach(async (record: any) => {
+//       await apiClient.delete(
+//         `/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`
+//       )
+//     })
+//     console.log('Deleted relationships successfully')
+//   } catch (error) {
+//     throw error
+//   }
+// }
