@@ -3,7 +3,7 @@ import AppError from '../utils/appError'
 
 let transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
-  secure: false,
+  secure: true,
   port: process.env.EMAIL_PORT,
   logger: true,
   debug: true,
