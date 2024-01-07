@@ -17,8 +17,14 @@ export const signTokens = async (user: student | parent) => {
   return { access_token }
 }
 
-export const generateVerifyEmailToken = async (email: string) => {
-  redisClient.set(email, email, {
+export const generateVerifyEmailToken = async ({
+  email,
+  userType,
+}: {
+  email: string
+  userType: 'student' | 'parent'
+}) => {
+  redisClient.set(email, JSON.stringify({ email, userType }), {
     EX: 24 * 60 * 60,
   })
   const token = signJwt(

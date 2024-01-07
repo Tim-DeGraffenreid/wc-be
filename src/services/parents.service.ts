@@ -8,28 +8,28 @@ export const getParents = async () => {
 
 export const createParent = async (data: Prisma.parentCreateInput) => {
   try {
-    data.password = await hashPassword(data.password);
-    data.birthday = new Date(data.birthday);
+    data.password = await hashPassword(data.password)
+    data.birthday = new Date(data.birthday)
 
     const parent = await prisma.parent.create({
       data,
-    });
+    })
 
-    return { success: true, data: parent };
+    return { success: true, data: parent }
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        return { success: false, message: 'Email or username is already in use.' };
+        return { success: false, message: 'Email or username is already in use.' }
       }
       // Add more cases as needed
     } else if (error instanceof Prisma.PrismaClientValidationError) {
-      return { success: false, message: 'Invalid data provided for creating a parent.' };
+      return { success: false, message: 'Invalid data provided for creating a parent.' }
     } else {
-      console.error('Error creating parent:', error);
-      return { success: false, message: 'An error occurred while creating the parent.' };
+      console.error('Error creating parent:', error)
+      return { success: false, message: 'An error occurred while creating the parent.' }
     }
   }
-};
+}
 
 export const findParentByEmail = async ({ email }: { email: string }) => {
   return await prisma.parent.findFirst({ where: { email } })
@@ -141,10 +141,15 @@ export const changeParentPassword = async (email: string, password: string) => {
 }
 
 export const deleteParent = async (id: string) => {
-  const delStudents = prisma.student.deleteMany({ where: { parentId: id } })
-  const delParent = prisma.parent.delete({ where: { id } })
+  try {
+    const delStudents = prisma.student.deleteMany({ where: { parentId: id } })
+    const delParent = prisma.parent.delete({ where: { id } })
 
-  return await prisma.$transaction([delStudents, delParent])
+    return await prisma.$transaction([delStudents, delParent])
+  } catch (error) {
+    console.error('Error deleting parent:', error)
+    return { success: false, message: 'An error occurred while deleting the parent.' }
+  }
 }
 
 export const updateParent = async (parent: parent, requestData: Partial<parent>) => {

@@ -270,27 +270,22 @@ export const sendConfirmationEmailHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { userType, email } = req.body
-    const session = await redisClient.get(email)
+    const { email, userType } = req.body
+    // const session = await redisClient.get(email)
 
-    if (session) {
-      return next(new AppError(400, 'Email already sent'))
-    }
+    // if (session) {
+    //   return next(new AppError(400, 'Email already sent'))
+    // }
 
-    let results
-    if (userType === 'parent') {
-      results = await findParentByEmail({ email })
-    } else if (userType === 'student') {
-      results = await findStudentByEmail({ email })
-    }
+    let results =
+      (await findParentByEmail({ email })) || (await findStudentByEmail({ email }))
 
-    console.log(results)
     if (results) {
       return next(new AppError(400, 'Email already exists'))
     }
 
-    const { token } = await generateVerifyEmailToken(email)
-    sendConfirmationEmail(email, token!)
+    const { token } = await generateVerifyEmailToken({ email, userType })
+    await sendConfirmationEmail(email, token!)
 
     res.status(201).json({
       status: 'success',
@@ -316,12 +311,13 @@ export const verifyEmailHandler = async (
     const session = await redisClient.get(decoded.sub)
 
     if (!session) {
-      return next(new AppError(401, `Invalid token or session has expired`))
+      return next(new AppError(401, `Invalid token or token has expired`))
     }
 
     res.status(200).json({
       status: 'success',
-      email: { ...JSON.parse(session) },
+      email: JSON.parse(session).email,
+      userType: JSON.parse(session).userType,
     })
   } catch (error) {
     next(error)
