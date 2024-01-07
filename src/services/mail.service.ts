@@ -12,9 +12,6 @@ let transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_HOST_PASSWORD,
   },
   from: process.env.DEFAULT_FROM_EMAIL,
-  tls: {
-    ciphers: 'SSLv3',
-  },
 })
 
 export const sendConfirmationEmail = async (email: string, token: string) => {
