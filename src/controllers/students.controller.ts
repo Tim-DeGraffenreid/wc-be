@@ -73,7 +73,7 @@ export const deleteStudentHandler = async (
   try {
     const { id } = req.params
     const student = await findStudentById(id)
-    const deleteFromSalesforce = await deleteUser(student.salesforceId)
+    const deleteFromSalesforce = await deleteUser(student.salesforceId, 'student')
 
     if (deleteFromSalesforce) {
       if (!student) {
@@ -179,8 +179,8 @@ export const updateStudentImageHandler = async (
       return next(new AppError(404, 'Student with id does not exist'))
     }
 
-    const b64 = Buffer.from(image.buffer).toString("base64");
-    let dataURI = "data:" + image.mimetype + ";base64," + b64;
+    const b64 = Buffer.from(image.buffer).toString('base64')
+    let dataURI = 'data:' + image.mimetype + ';base64,' + b64
     const { public_id, secure_url } = await uploadImage(dataURI)
     const updatedStudent = await updateStudent(student, {
       profileImagePublicId: public_id,

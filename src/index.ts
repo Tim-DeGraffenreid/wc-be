@@ -39,21 +39,21 @@ connectRedis()
     app.use('/api/students', studentRouter)
 
     // Sync salesforce data every 2mins
-    cron.schedule('*/2 * * * *', async () => {
-      try {
-        await syncDatabaseAndSalesforce()
-      } catch (error) {
-        console.error('Error during scheduled synchronization:', error)
-      }
-    })
+    // cron.schedule('*/2 * * * *', async () => {
+    //   try {
+    //     await syncDatabaseAndSalesforce()
+    //   } catch (error) {
+    //     console.error('Error during scheduled synchronization:', error)
+    //   }
+    // })
 
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await handleParentToChildren()
-      } catch (error) {
-        console.error('Error during scheduled relationship update:', error)
-      }
-    })
+    // cron.schedule('*/1 * * * *', async () => {
+    //   try {
+    //     await handleParentToChildren()
+    //   } catch (error) {
+    //     console.error('Error during scheduled relationship update:', error)
+    //   }
+    // })
 
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')

@@ -47,8 +47,6 @@ router
 router
   .route('/add-to-class/:studentId/:classId')
   .post(deserializeUser, requireUser, addChildToClassHandler)
-router
-  .route('/:studentId/image')
-  .post(deserializeUser, requireUser, upload.single('profile'), addChildImageHandler)
+router.route('/:studentId/image').post(upload.single('profile'), addChildImageHandler)
 
 export default router

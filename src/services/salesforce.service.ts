@@ -158,13 +158,32 @@ export const updateParentSalesforce = async (id: string, parent: parent) => {
   }
 }
 
-export const deleteUser = async (id: string) => {
+export const deleteUser = async (id: string, type: 'parent' | 'student') => {
   try {
-    const response = await apiClient.delete(`/services/data/v52.0/sObjects/Contact/${id}`)
+    await deleteRelationship(id, type)
+    const response = await apiClient.delete(`/services/data/v58.0/sobjects/Contact/${id}`)
 
-    return response.data
+    console.log(response.data)
+
+    return true
   } catch (error) {
     console.error('Deletion of salesforce failed:', error)
+    throw error
+  }
+}
+
+const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
+  try {
+    const url =
+      type === 'parent'
+        ? `/services/data/v58.0/query?q=DELETE+*+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c=${id}`
+        : `/services/data/v58.0/query?q=DELETE+*+FROM+npe4__Relationship__c+WHERE+npe4__Contact__c=${id}`
+    const response = await apiClient.delete(url)
+
+    console.log(response.data)
+    return true
+  } catch (error) {
+    console.error('Deletion of salesforce relationship failed:', error)
     throw error
   }
 }

@@ -19,7 +19,7 @@ import {
   updateParentSalesforce,
 } from '../services/salesforce.service'
 import { findStudentById, updateStudent } from '../services/students.service'
-import { uploadImage } from '../services/cloudinary.service'
+import { deleteImage, uploadImage } from '../services/cloudinary.service'
 
 export const getParentsHandler = async (
   req: Request,
@@ -69,7 +69,7 @@ export const deleteParentHandler = async (
       return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    const deleteFromSalesforce = await deleteUser(parent.salesforceId)
+    const deleteFromSalesforce = await deleteUser(parent.salesforceId, 'parent')
 
     if (deleteFromSalesforce) {
       await deleteParent(id)
@@ -223,7 +223,11 @@ export const addChildToClassHandler = async (
   }
 }
 
-export const addChildImageHandler = async (req: Request, res: Response, next: NextFunction) => {
+export const addChildImageHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { studentId } = req.params
     const image = req.file as Express.Multer.File
@@ -238,8 +242,14 @@ export const addChildImageHandler = async (req: Request, res: Response, next: Ne
       return next(new AppError(404, 'Student with id does not exist'))
     }
 
-    const b64 = Buffer.from(image.buffer).toString("base64");
-    let dataURI = "data:" + image.mimetype + ";base64," + b64;
+    if (student.profileImagePublicId && student.profileImageSecureUrl) {
+      await deleteImage(student.profileImagePublicId)
+      student.profileImagePublicId = null
+      student.profileImageSecureUrl = null
+    }
+
+    const b64 = Buffer.from(image.buffer).toString('base64')
+    let dataURI = 'data:' + image.mimetype + ';base64,' + b64
     const { public_id, secure_url } = await uploadImage(dataURI)
     const updatedStudent = await updateStudent(student, {
       profileImagePublicId: public_id,
