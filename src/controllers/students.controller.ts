@@ -73,7 +73,7 @@ export const deleteStudentHandler = async (
   try {
     const { id } = req.params
     const student = await findStudentById(id)
-    const deleteFromSalesforce = await deleteUser(student.salesforceId, 'student')
+    const deleteFromSalesforce = await deleteUser(student.salesforceId!, 'student')
 
     if (deleteFromSalesforce) {
       if (!student) {
@@ -105,7 +105,7 @@ export const updateStudentHandler = async (
     }
 
     student = await updateStudent(student, req.body)
-    const salesforce = await updateStudentSalesforce(student.salesforceId, student)
+    const salesforce = await updateStudentSalesforce(student.salesforceId!, student)
     if (salesforce) {
       res.status(200).json({
         status: 'success',

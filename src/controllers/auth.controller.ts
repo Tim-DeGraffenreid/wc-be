@@ -4,12 +4,14 @@ import {
   changeParentPassword,
   createParent,
   findParentByEmail,
+  updateParent,
 } from '../services/parents.service'
 import { generateVerifyEmailToken, signTokens } from '../services/auth.service'
 import {
   createStudent,
   findStudentByDetails,
   findStudentByEmail,
+  updateStudent,
 } from '../services/students.service'
 import { comparePasswords } from '../utils/password.manager'
 import prisma from '../utils/prisma'
@@ -78,51 +80,50 @@ const accessTokenCookieOptions: CookieOptions = {
 // }
 export const registerParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const salesforceResponse = await addParentToSalesforce(req.body)
-
-    // Check if Salesforce response is as expected
-    if (typeof salesforceResponse === 'object' && 'id' in salesforceResponse) {
-      const parentRes = await createParent({
-        ...req.body,
-        salesforceId: salesforceResponse.id as string,
-      })
-
-      // Sign tokens and handle potential errors
-      if (parentRes?.success) {
-        const { access_token } = await signTokens(parentRes.data!)
-        if (!access_token) {
-          console.error('Error signing tokens')
-          return res.status(500).json({
-            status: 'error',
-            message: 'An unexpected error occurred while signing tokens.',
-          })
-        }
-
-        // Set cookies and respond with success
-        res.cookie('access_token', access_token, accessTokenCookieOptions)
-        res.cookie('user_type', 'parent', {
-          ...accessTokenCookieOptions,
-          httpOnly: false,
-        })
-        res.cookie('logged_in', true, {
-          ...accessTokenCookieOptions,
-          httpOnly: false,
-        })
-
-        return res.status(201).json({
-          status: 'success',
-          access_token,
-          data: {
-            ...parentRes.data,
-          },
-        })
-      } else {
-        console.error('Error creating parent')
+    const parentRes = await createParent({
+      ...req.body,
+    })
+    if (parentRes?.success) {
+      const salesforceResponse = await addParentToSalesforce(req.body)
+      if (
+        typeof salesforceResponse === 'object' &&
+        'id' in salesforceResponse &&
+        parentRes?.data
+      ) {
+        updateParent(parentRes?.data, { salesforceId: salesforceResponse.id })
+      }
+      const { access_token } = await signTokens(parentRes.data!)
+      if (!access_token) {
+        console.error('Error signing tokens')
         return res.status(500).json({
           status: 'error',
-          message: parentRes?.message,
+          message: 'An unexpected error occurred while signing tokens.',
         })
       }
+
+      // Set cookies and respond with success
+      res.cookie('access_token', access_token, accessTokenCookieOptions)
+      res.cookie('user_type', 'parent', {
+        ...accessTokenCookieOptions,
+        httpOnly: false,
+      })
+      res.cookie('logged_in', true, {
+        ...accessTokenCookieOptions,
+        httpOnly: false,
+      })
+
+      return res.status(201).json({
+        status: 'success',
+        access_token,
+        data: {
+          ...parentRes.data,
+        },
+      })
+    } else {
+      return res.status(500).json({
+        status: 'error',
+        message: parentRes?.message,
+      })
     }
   } catch (error: any) {
     console.error('Unexpected Error:', error)
@@ -139,11 +140,11 @@ export const registerStudent = async (
   next: NextFunction
 ) => {
   try {
-    const salesforce = await addStudentToSalesforce(req.body)
-    if (typeof salesforce === 'object' && 'id' in salesforce) {
-      const studentRes = await createStudent({ ...req.body, salesforceId: salesforce.id })
-
-      if (studentRes?.success) {
+    const studentRes = await createStudent({ ...req.body })
+    if (studentRes?.success) {
+      const salesforce = await addStudentToSalesforce(req.body)
+      if (typeof salesforce === 'object' && 'id' in salesforce && studentRes?.data) {
+        await updateStudent(studentRes?.data, { salesforceId: salesforce?.id })
         const { access_token } = await signTokens(studentRes.data!)
 
         res.cookie('access_token', access_token, accessTokenCookieOptions)
@@ -163,13 +164,12 @@ export const registerStudent = async (
             ...studentRes.data,
           },
         })
-      } else {
-        console.error('Error creating parent')
-        return res.status(500).json({
-          status: 'error',
-          message: studentRes?.message,
-        })
       }
+    } else {
+      return res.status(500).json({
+        status: 'error',
+        message: studentRes?.message,
+      })
     }
   } catch (error: any) {
     console.error('Unexpected Error:', error)

@@ -96,16 +96,16 @@ export const addParentToSalesforce = async (parent: parent) => {
 
     return response.data
   } catch (error: any) {
-    console.error('Creation of parent to salesforce failed:', error)
+    // console.error('Creation of parent to salesforce failed:', error)
 
     if (error.response) {
-      console.error('Response error:', error.response.data[0]?.errorCode)
+      // console.error('Response error:', error.response.data[0]?.errorCode)
 
       throw error.response.data[0]?.errorCode
     } else if (error.request) {
-      console.error('No response received:', error.request)
+      // console.error('No response received:', error.request)
     } else {
-      console.error('Request setup error:', error.message)
+      // console.error('Request setup error:', error.message)
     }
     throw error
   }
@@ -218,12 +218,12 @@ export const syncDatabaseAndSalesforce = async () => {
       let savedData
       if (Parent_or_Student__c === 'parent') {
         savedData = await prisma.parent.update({
-          where: { salesforceId: record?.id },
+          where: { id: record.id, salesforceId: record?.id },
           data: { ...convertedData },
         })
       } else if (record?.Parent_or_Student__ === 'student') {
         savedData = await prisma.student.update({
-          where: { salesforceId: record?.id },
+          where: { id: record.id, salesforceId: record?.id },
           data: { ...convertedData },
         })
       }
@@ -251,15 +251,17 @@ export const handleParentToChildren = async () => {
             relationship.npe4__Type__c === 'Parent'
         )
 
-        if (!isExistingRelationship) {
-          await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
-            npe4__Contact__c: child.salesforceId,
-            npe4__RelatedContact__c: parent.salesforceId,
-            npe4__Type__c: 'Parent',
-          })
+        console.log(`${parent.salesforceId}: ${child.salesforceId}`)
 
-          console.log('Added relationship to parent successfully')
-        }
+        // if (!isExistingRelationship) {
+        //   await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
+        //     npe4__Contact__c: child.salesforceId,
+        //     npe4__RelatedContact__c: parent.salesforceId,
+        //     npe4__Type__c: 'Parent',
+        //   })
+
+        //   console.log('Added relationship to parent successfully')
+        // }
       }
     })
     console.log('Finished adding relationships to parents')
@@ -274,7 +276,7 @@ const getDataFromSalesforce = async () => {
     const response = await apiClient.get(
       `/services/data/v58.0/query?q=SELECT+Id,FirstName,LastName,Email,CreatedDate,Parent_or_Student__c,Phone,BirthDate,Grade__c,School__c,Gender__c,MailingPostalCode,Education_Level__c,Veteran_Status__c,Do_you_have_regular_transportation__c,Residence_Type__c+FROM+Contact`
     )
-    return response.data
+    return response.data || []
   } catch (error) {
     console.error('Error fetching data from salesforce:', error)
     throw error
