@@ -243,28 +243,28 @@ export const handleParentToChildren = async () => {
 
     data.forEach(async (parent) => {
       for (const child of parent.student) {
-        // Check if the relationship already exists
-        const isExistingRelationship = existingRelationships.some(
-          (relationship: any) =>
-            relationship.npe4__Contact__c === child.salesforceId &&
-            relationship.npe4__RelatedContact__c === parent.salesforceId &&
-            relationship.npe4__Type__c === 'Parent'
-        )
+        if (parent?.salesforceId && child?.salesforceId) {
+          const isExistingRelationship = existingRelationships.some(
+            (relationship: any) =>
+              relationship.npe4__Contact__c === child.salesforceId &&
+              relationship.npe4__RelatedContact__c === parent.salesforceId &&
+              relationship.npe4__Type__c === 'Parent'
+          )
 
-        console.log(`${parent.salesforceId}: ${child.salesforceId}`)
+          console.log(`${parent.salesforceId}: ${child.salesforceId}`)
 
-        // if (!isExistingRelationship) {
-        //   await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
-        //     npe4__Contact__c: child.salesforceId,
-        //     npe4__RelatedContact__c: parent.salesforceId,
-        //     npe4__Type__c: 'Parent',
-        //   })
+          if (!isExistingRelationship) {
+            await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
+              npe4__Contact__c: child.salesforceId,
+              npe4__RelatedContact__c: parent.salesforceId,
+              npe4__Type__c: 'Parent',
+            })
 
-        //   console.log('Added relationship to parent successfully')
-        // }
+            console.log('Added relationship to parent successfully')
+          }
+        }
       }
     })
-    console.log('Finished adding relationships to parents')
     return
   } catch (error) {
     console.error('Error saving relationship to Salesforce:', error)
