@@ -23,6 +23,7 @@ export const createParent = async (data: Prisma.parentCreateInput) => {
       }
       // Add more cases as needed
     } else if (error instanceof Prisma.PrismaClientValidationError) {
+      console.log(error.message)
       return { success: false, message: 'Invalid data provided for creating a parent.' }
     } else {
       console.error('Error creating parent:', error)

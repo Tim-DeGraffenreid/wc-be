@@ -69,7 +69,7 @@ export const deleteParentHandler = async (
       return next(new AppError(404, 'Parent with id does not exist'))
     }
 
-    const deleteFromSalesforce = await deleteUser(parent.salesforceId, 'parent')
+    const deleteFromSalesforce = await deleteUser(parent.salesforceId!, 'parent')
 
     if (deleteFromSalesforce) {
       await deleteParent(id)
@@ -94,17 +94,10 @@ export const addStudentsHandler = async (
   }
 
   try {
+    const student = await createNewStudent({ ...req.body }, id)
     const salesforce = await addStudentToSalesforce(req.body)
     if (salesforce) {
-      const student = await createNewStudent(
-        { ...req.body, salesforceId: salesforce?.id },
-        id
-      )
-
-      res.status(201).json({
-        status: 'success',
-        data: student,
-      })
+      await updateStudent(student, { salesforceId: salesforce.id })
     }
   } catch (error) {
     next(error)
@@ -144,7 +137,7 @@ export const updateParentsHandler = async (
     }
 
     parent = await updateParent(parent, req.body)
-    const salesforce = await updateParentSalesforce(parent.salesforceId, parent)
+    const salesforce = await updateParentSalesforce(parent.salesforceId!, parent)
     if (salesforce) {
       res.status(200).json({
         status: 'success',
