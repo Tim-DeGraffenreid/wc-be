@@ -41,26 +41,34 @@ export const findParentById = async (userId: string) => {
 }
 
 export const createNewStudent = async (studentData: student, parentId: string) => {
-  studentData.birthday = new Date(studentData.birthday)
-  studentData.password = await hashPassword(studentData.password)
-  const student = await prisma.student.create({
-    data: {
-      ...studentData,
-    },
-  })
+  try {
+    studentData.birthday = new Date(studentData.birthday)
+    studentData.password = await hashPassword(studentData.password)
+    const student = await prisma.student.create({
+      data: {
+        ...studentData,
+      },
+    })
 
-  await prisma.parent.update({
-    where: { id: parentId },
-    data: {
-      student: {
-        connect: {
-          id: student.id,
+    await prisma.parent.update({
+      where: { id: parentId },
+      data: {
+        student: {
+          connect: {
+            id: student.id,
+          },
         },
       },
-    },
-  })
+    })
 
-  return student
+    return student
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      throw new Error('A student with the provided data already exists.')
+    }
+
+    throw error
+  }
 }
 
 export const getStudents = async (id: string) => {
