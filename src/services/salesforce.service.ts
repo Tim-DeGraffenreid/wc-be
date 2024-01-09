@@ -46,7 +46,7 @@ apiClient.interceptors.request.use(async (config) => {
 export const addStudentToSalesforce = async (student: student) => {
   try {
     const data = {
-      Parent_or_Student__c: 'student', //this indicates whether a student or not, right?
+      Parent_or_Student__c: 'student',
       Email: student.email,
       LastName: student.lName,
       FirstName: student.fName,
@@ -355,22 +355,18 @@ export const getStudentId = async () => {
   }
 }
 
-// // Testing
-// export const testSalesforceRelationship = async (id = '003DC00000S96ckYAB') => {
-//   try {
-//     const response = await apiClient.get(
-//       `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='${id}'+limit 1`
-//     )
+export const checkSalesforceForDuplicates = async (
+  email?: string,
+  phoneNumber?: string
+) => {
+  // try {
+  const salesforceData = await getDataFromSalesforce()
 
-//     const records = response.data?.records
-
-//     records.forEach(async (record: any) => {
-//       await apiClient.delete(
-//         `/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`
-//       )
-//     })
-//     console.log('Deleted relationships successfully')
-//   } catch (error) {
-//     throw error
-//   }
-// }
+  const exists = salesforceData?.records?.some(
+    (record: any) => record?.Email === email || record?.Phone === phoneNumber
+  )
+  return exists
+  // } catch (error) {
+  //   throw error
+  // }
+}

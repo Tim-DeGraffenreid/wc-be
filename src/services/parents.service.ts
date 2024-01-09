@@ -19,7 +19,7 @@ export const createParent = async (data: Prisma.parentCreateInput) => {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        return { success: false, message: 'Email or username is already in use.' }
+        return { success: false, message: 'Email or phone number is already in use.' }
       }
       // Add more cases as needed
     } else if (error instanceof Prisma.PrismaClientValidationError) {

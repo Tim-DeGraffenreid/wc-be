@@ -19,14 +19,14 @@ export const createStudent = async (data: student) => {
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
-        return { success: false, message: 'Email or username is already in use.' };
+        return { success: false, message: 'Email or phone number is already in use.' }
       }
       // Add more cases as needed
     } else if (error instanceof Prisma.PrismaClientValidationError) {
-      return { success: false, message: 'Invalid data provided for creating a parent.' };
+      return { success: false, message: 'Invalid data provided for creating a parent.' }
     } else {
-      console.error('Error creating parent:', error);
-      return { success: false, message: 'An error occurred while creating the parent.' };
+      console.error('Error creating parent:', error)
+      return { success: false, message: 'An error occurred while creating the parent.' }
     }
   }
 }
