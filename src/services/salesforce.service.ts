@@ -251,8 +251,6 @@ export const handleParentToChildren = async () => {
               relationship.npe4__Type__c === 'Parent'
           )
 
-          console.log(`${parent.salesforceId}: ${child.salesforceId}`)
-
           if (!isExistingRelationship) {
             await apiClient.post(`/services/data/v58.0/sobjects/npe4__Relationship__c`, {
               npe4__Contact__c: child.salesforceId,

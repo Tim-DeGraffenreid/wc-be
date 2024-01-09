@@ -95,29 +95,29 @@ export const addStudentsHandler = async (
   }
 
   try {
-    const checkIfExist = await checkSalesforceForDuplicates(
-      req?.body?.email,
-      req?.body?.phone
-    )
+    // const checkIfExist = await checkSalesforceForDuplicates(
+    //   req?.body?.email,
+    //   req?.body?.phone
+    // )
 
-    console.log(checkIfExist)
-    if (!checkIfExist!) {
-      const student = await createNewStudent({ ...req.body }, id)
-      const salesforce = await addStudentToSalesforce(req.body)
-      if (salesforce) {
-        await updateStudent(student, { salesforceId: salesforce.id })
+    // console.log(checkIfExist)
+    // if (!checkIfExist!) {
+    // const student = await createNewStudent({ ...req.body }, id)
+    const salesforce = await addStudentToSalesforce(req.body)
+    if (salesforce) {
+      // await updateStudent(student, { salesforceId: salesforce.id })
 
-        res.status(201).json({
-          status: 'success',
-          data: student,
-        })
-      }
-    } else {
-      res.status(409).json({
-        status: 'error',
-        message: 'Student with that email or phone number already exists',
+      res.status(201).json({
+        status: 'success',
+        // data: student,
       })
     }
+    // } else {
+    //   res.status(409).json({
+    //     status: 'error',
+    //     message: 'Student with that email or phone number already exists',
+    //   })
+    // }
   } catch (error: any) {
     console.error('Unexpected Error:', error)
     res.status(500).json({
