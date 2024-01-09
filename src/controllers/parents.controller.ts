@@ -15,6 +15,7 @@ import {
 import { findClassById } from '../services/class.service'
 import {
   addStudentToSalesforce,
+  checkSalesforceForDuplicates,
   deleteUser,
   updateParentSalesforce,
 } from '../services/salesforce.service'
@@ -94,13 +95,35 @@ export const addStudentsHandler = async (
   }
 
   try {
-    const student = await createNewStudent({ ...req.body }, id)
-    const salesforce = await addStudentToSalesforce(req.body)
-    if (salesforce) {
-      await updateStudent(student, { salesforceId: salesforce.id })
+    const checkIfExist = await checkSalesforceForDuplicates(
+      req?.body?.email,
+      req?.body?.phone
+    )
+
+    console.log(checkIfExist)
+    if (!checkIfExist!) {
+      const student = await createNewStudent({ ...req.body }, id)
+      const salesforce = await addStudentToSalesforce(req.body)
+      if (salesforce) {
+        await updateStudent(student, { salesforceId: salesforce.id })
+
+        res.status(201).json({
+          status: 'success',
+          data: student,
+        })
+      }
+    } else {
+      res.status(409).json({
+        status: 'error',
+        message: 'Student with that email or phone number already exists',
+      })
     }
-  } catch (error) {
-    next(error)
+  } catch (error: any) {
+    console.error('Unexpected Error:', error)
+    res.status(500).json({
+      status: 'error',
+      message: error ? error?.message : 'An unexpected error occurred.',
+    })
   }
 }
 
