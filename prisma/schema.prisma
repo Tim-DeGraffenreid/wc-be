@@ -55,7 +55,7 @@ model parent {
   id                    String            @id(map: "PK_bf93c41ee1ae1649869ebd05617") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   created_at            DateTime          @default(now()) @db.Timestamp(6)
   updated_at            DateTime          @default(now()) @db.Timestamp(6)
-  email                 String            @unique(map: "UQ_9158391af7b8ca4911efaad8a73") @db.VarChar
+  email                 String            @db.VarChar
   password              String            @db.VarChar
   fName                 String            @db.VarChar
   lName                 String            @db.VarChar
@@ -69,15 +69,13 @@ model parent {
   demographic_info      demographic_info? @relation(fields: [demographicInfoId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_58da1e5e410ef2ba35d6944ade5")
   student               student[]
   salesforceId          String?           @unique() @db.VarChar
-
-  @@index([email], map: "parent_email_index")
 }
 
 model student {
   id          String              @id(map: "PK_3d8016e1cb58429474a3c041904") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   created_at  DateTime            @default(now()) @db.Timestamp(6)
   updated_at  DateTime            @default(now()) @db.Timestamp(6)
-  email       String              @unique(map: "UQ_a56c051c91dbe1068ad683f536e") @db.VarChar
+  email       String              @db.VarChar
   password    String              @db.VarChar
   fName       String              @db.VarChar
   lName       String              @db.VarChar
@@ -94,8 +92,6 @@ model student {
   emergencyContact    String?
   profileImagePublicId String?
   profileImageSecureUrl String?
-
-  @@index([email], map: "student_email_index")
 }
 
 enum student_gender_enum {
