@@ -13,8 +13,7 @@ export const deserializeUser = async (
 ) => {
   try {
     let access_token
-    // const userType: UserType = req.cookies.user_type
-    const userType = 'parent'
+    const userType: UserType = req.cookies.user_type
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       access_token = req.headers.authorization.split(' ')[1]
