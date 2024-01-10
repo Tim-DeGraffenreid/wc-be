@@ -186,11 +186,11 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 
     let user
     if (userType === 'parent') {
-      user = await prisma.parent.findUnique({
+      user = await prisma.parent.findFirst({
         where: { email },
       })
     } else {
-      user = await prisma.student.findUnique({
+      user = await prisma.student.findFirst({
         where: { email },
       })
     }
