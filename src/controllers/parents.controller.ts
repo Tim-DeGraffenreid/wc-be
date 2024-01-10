@@ -102,14 +102,14 @@ export const addStudentsHandler = async (
 
     // console.log(checkIfExist)
     // if (!checkIfExist!) {
-    // const student = await createNewStudent({ ...req.body }, id)
+    const student = await createNewStudent({ ...req.body }, id)
     const salesforce = await addStudentToSalesforce(req.body)
     if (salesforce) {
-      // await updateStudent(student, { salesforceId: salesforce.id })
+      await updateStudent(student, { salesforceId: salesforce.id })
 
       res.status(201).json({
         status: 'success',
-        // data: student,
+        data: student,
       })
     }
     // } else {
