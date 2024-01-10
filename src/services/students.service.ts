@@ -32,7 +32,7 @@ export const createStudent = async (data: student) => {
 }
 
 export const findStudentByEmail = async ({ email }: { email: string }) => {
-  return await prisma.student.findUnique({ where: { email } })
+  return await prisma.student.findFirst({ where: { email } })
 }
 
 export const findStudentById = async (userId: string) => {
