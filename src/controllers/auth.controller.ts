@@ -80,51 +80,51 @@ const accessTokenCookieOptions: CookieOptions = {
 // }
 export const registerParent = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // const parentRes = await createParent({
-    //   ...req.body,
-    // })
-    // if (parentRes?.success) {
-    const salesforceResponse = await addParentToSalesforce(req.body)
-    // if (
-    //   typeof salesforceResponse === 'object' &&
-    //   'id' in salesforceResponse &&
-    //   parentRes?.data
-    // ) {
-    //   updateParent(parentRes?.data, { salesforceId: salesforceResponse.id })
-    // }
-    // const { access_token } = await signTokens(parentRes.data!)
-    // if (!access_token) {
-    //   console.error('Error signing tokens')
-    //   return res.status(500).json({
-    //     status: 'error',
-    //     message: 'An unexpected error occurred while signing tokens.',
-    //   })
-    // }
+    const parentRes = await createParent({
+      ...req.body,
+    })
+    if (parentRes?.success) {
+      const salesforceResponse = await addParentToSalesforce(req.body)
+      if (
+        typeof salesforceResponse === 'object' &&
+        'id' in salesforceResponse &&
+        parentRes?.data
+      ) {
+        updateParent(parentRes?.data, { salesforceId: salesforceResponse.id })
+      }
+      const { access_token } = await signTokens(parentRes.data!)
+      if (!access_token) {
+        console.error('Error signing tokens')
+        return res.status(500).json({
+          status: 'error',
+          message: 'An unexpected error occurred while signing tokens.',
+        })
+      }
 
-    // Set cookies and respond with success
-    // res.cookie('access_token', access_token, accessTokenCookieOptions)
-    res.cookie('user_type', 'parent', {
-      ...accessTokenCookieOptions,
-      httpOnly: false,
-    })
-    res.cookie('logged_in', true, {
-      ...accessTokenCookieOptions,
-      httpOnly: false,
-    })
+      // Set cookies and respond with success
+      res.cookie('access_token', access_token, accessTokenCookieOptions)
+      res.cookie('user_type', 'parent', {
+        ...accessTokenCookieOptions,
+        httpOnly: false,
+      })
+      res.cookie('logged_in', true, {
+        ...accessTokenCookieOptions,
+        httpOnly: false,
+      })
 
-    return res.status(201).json({
-      status: 'success',
-      // access_token,
-      // data: {
-      //   ...parentRes.data,
-      // },
-    })
-    // } else {
-    //   return res.status(500).json({
-    //     status: 'error',
-    //     message: parentRes?.message,
-    //   })
-    // }
+      return res.status(201).json({
+        status: 'success',
+        access_token,
+        data: {
+          ...parentRes.data,
+        },
+      })
+    } else {
+      return res.status(500).json({
+        status: 'error',
+        message: parentRes?.message,
+      })
+    }
   } catch (error: any) {
     console.error('Unexpected Error:', error)
     return res.status(500).json({
