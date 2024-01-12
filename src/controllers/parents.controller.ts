@@ -73,9 +73,11 @@ export const deleteParentHandler = async (
 
     const deleteParentFromSalesforce = await deleteUser(parent.salesforceId!, 'parent')
     if (deleteParentFromSalesforce) {
-      students.forEach(async (student) => {
+      const deleteStudentPromises = students.map(async (student) => {
         await deleteUser(student.salesforceId!, 'student')
       })
+
+      await Promise.all(deleteStudentPromises)
 
       salesforceSuccess = true
     }
