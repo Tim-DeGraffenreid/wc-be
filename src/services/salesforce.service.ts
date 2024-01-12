@@ -186,11 +186,14 @@ const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
 
     const records = response.data?.records
 
-    records.forEach(async (record: any) => {
-      await apiClient.delete(
-        `/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`
-      )
-    })
+    await Promise.all(
+      records.map(async (record: any) => {
+        await apiClient.delete(
+          `/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`
+        )
+      })
+    )
+
     console.log('Deleted relationships successfully')
   } catch (error) {
     console.log(`Error deleting relationships: ${error}`)
@@ -203,17 +206,21 @@ export const deleteFromDatabase = async () => {
     const students = await prisma.student.findMany()
     const parents = await prisma.parent.findMany()
 
-    students.forEach(async (student: student) => {
-      if (student.salesforceId === null) {
-        await prisma.student.delete({ where: { id: student.id } })
-      }
-    })
+    await Promise.all(
+      students.map(async (student: student) => {
+        if (student.salesforceId === null) {
+          await prisma.student.delete({ where: { id: student.id } })
+        }
+      })
+    )
 
-    parents.forEach(async (parent: parent) => {
-      if (parent.salesforceId === null) {
-        await prisma.parent.delete({ where: { id: parent.id } })
-      }
-    })
+    await Promise.all(
+      parents.map(async (parent: parent) => {
+        if (parent.salesforceId === null) {
+          await prisma.parent.delete({ where: { id: parent.id } })
+        }
+      })
+    )
 
     return
   } catch (error) {
@@ -226,7 +233,7 @@ export const syncDatabaseAndSalesforce = async () => {
   try {
     const salesforceData = await getDataFromSalesforce()
 
-    salesforceData?.records?.forEach(async (record: any) => {
+    const salesforcePromise = salesforceData?.records?.map(async (record: any) => {
       const { Parent_or_Student__c, ...data } = record
       const convertedData = {
         email: data?.Email,
@@ -257,6 +264,7 @@ export const syncDatabaseAndSalesforce = async () => {
       }
     })
 
+    await Promise.all(salesforcePromise)
     return
   } catch (error) {
     console.error('Error while syncing', error)
@@ -269,7 +277,7 @@ export const handleParentToChildren = async () => {
     const data = await prisma.parent.findMany({ include: { student: true } })
     const existingRelationships = await getRelationshipsFromSalesforce()
 
-    data.forEach(async (parent) => {
+    const relationshipPromise = data.map(async (parent) => {
       for (const child of parent.student) {
         if (parent?.salesforceId && child?.salesforceId) {
           const isExistingRelationship = existingRelationships.some(
@@ -291,6 +299,8 @@ export const handleParentToChildren = async () => {
         }
       }
     })
+
+    await Promise.all(relationshipPromise)
     return
   } catch (error) {
     console.error('Error saving relationship to Salesforce:', error)
