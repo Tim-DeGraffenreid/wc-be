@@ -14,7 +14,6 @@ export const deserializeUser = async (
   try {
     let access_token
     const userType: UserType = req.cookies.user_type
-    console.log(userType)
     // const userType = 'parent'
 
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
