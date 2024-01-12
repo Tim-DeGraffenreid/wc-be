@@ -160,10 +160,14 @@ export const updateParentSalesforce = async (id: string, parent: parent) => {
 
 export const deleteUser = async (id: string, type: 'parent' | 'student') => {
   try {
-    await deleteRelationship(id, type)
-    const response = await apiClient.delete(`/services/data/v58.0/sobjects/Contact/${id}`)
+    if (id !== null) {
+      await deleteRelationship(id, type)
+      const response = await apiClient.delete(
+        `/services/data/v58.0/sobjects/Contact/${id}`
+      )
 
-    console.log(response.data)
+      console.log(response.data)
+    }
 
     return true
   } catch (error) {
@@ -190,6 +194,30 @@ const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
     console.log('Deleted relationships successfully')
   } catch (error) {
     console.log(`Error deleting relationships: ${error}`)
+    throw error
+  }
+}
+
+export const deleteFromDatabase = async () => {
+  try {
+    const students = await prisma.student.findMany()
+    const parents = await prisma.parent.findMany()
+
+    students.forEach(async (student: student) => {
+      if (student.salesforceId === null) {
+        await prisma.student.delete({ where: { id: student.id } })
+      }
+    })
+
+    parents.forEach(async (parent: parent) => {
+      if (parent.salesforceId === null) {
+        await prisma.parent.delete({ where: { id: parent.id } })
+      }
+    })
+
+    return
+  } catch (error) {
+    console.log(`Error deleting from database: ${error}`)
     throw error
   }
 }

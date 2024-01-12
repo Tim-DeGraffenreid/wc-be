@@ -15,7 +15,6 @@ import {
 import { findClassById } from '../services/class.service'
 import {
   addStudentToSalesforce,
-  checkSalesforceForDuplicates,
   deleteUser,
   updateParentSalesforce,
 } from '../services/salesforce.service'
@@ -66,13 +65,22 @@ export const deleteParentHandler = async (
   try {
     const { id } = req.params
     const parent = await findParentById(id)
+    const students = await getStudents(id)
     if (!parent) {
       return next(new AppError(404, 'Parent with id does not exist'))
     }
+    let salesforceSuccess = false
 
-    const deleteFromSalesforce = await deleteUser(parent.salesforceId!, 'parent')
+    const deleteParentFromSalesforce = await deleteUser(parent.salesforceId!, 'parent')
+    if (deleteParentFromSalesforce) {
+      students.forEach(async (student) => {
+        await deleteUser(student.salesforceId!, 'student')
+      })
 
-    if (deleteFromSalesforce) {
+      salesforceSuccess = true
+    }
+
+    if (salesforceSuccess) {
       await deleteParent(id)
       res.status(204).json({
         status: 'success',
@@ -104,7 +112,7 @@ export const addStudentsHandler = async (
     // if (!checkIfExist!) {
     const student = await createNewStudent({ ...req.body }, id)
     const salesforce = await addStudentToSalesforce(req.body)
-    if (salesforce) {
+    if (typeof salesforce === 'object' && salesforce.id) {
       await updateStudent(student, { salesforceId: salesforce.id })
 
       res.status(201).json({

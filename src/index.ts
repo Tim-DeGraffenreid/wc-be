@@ -18,6 +18,7 @@ import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient, { connectRedis } from './utils/connectRedis'
 import {
+  deleteFromDatabase,
   handleParentToChildren,
   syncDatabaseAndSalesforce,
 } from './services/salesforce.service'
@@ -38,7 +39,7 @@ connectRedis()
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
 
-    // Sync salesforce data every 2mins
+    // CronJobs
     cron.schedule('*/1 * * * *', async () => {
       try {
         await syncDatabaseAndSalesforce()
@@ -55,6 +56,15 @@ connectRedis()
       }
     })
 
+    cron.schedule('*/1 * * * *', async () => {
+      try {
+        await deleteFromDatabase()
+      } catch (error) {
+        console.error('Error during schedule database deletion:', error)
+      }
+    })
+
+    // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')
 
@@ -64,10 +74,12 @@ connectRedis()
       })
     })
 
+    // Route not found handler
     app.all('*', (req: Request, _res: Response, next: NextFunction) => {
       next(new AppError(404, `Route ${req.originalUrl} not found`))
     })
 
+    // Error handler across app
     app.use((error: AppError, _req: Request, res: Response, _next: NextFunction) => {
       error.status = error.status || 'error'
       error.statusCode = error.statusCode || 500

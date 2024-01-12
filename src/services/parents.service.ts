@@ -37,7 +37,9 @@ export const findParentByEmail = async ({ email }: { email: string }) => {
 }
 
 export const findParentById = async (userId: string) => {
-  return await prisma.parent.findUnique({ where: { id: userId } })
+  return await prisma.parent.findUnique({
+    where: { id: userId },
+  })
 }
 
 export const createNewStudent = async (studentData: student, parentId: string) => {
