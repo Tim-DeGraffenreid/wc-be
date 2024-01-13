@@ -56,7 +56,7 @@ connectRedis()
       }
     })
 
-    cron.schedule('*/1 * * * *', async () => {
+    cron.schedule('*/2 * * * *', async () => {
       try {
         await deleteFromDatabase()
       } catch (error) {
