@@ -206,21 +206,17 @@ export const deleteFromDatabase = async () => {
     const students = await prisma.student.findMany()
     const parents = await prisma.parent.findMany()
 
-    await Promise.all(
-      students.map(async (student: student) => {
-        if (student.salesforceId === null) {
-          await prisma.student.delete({ where: { id: student.id } })
-        }
-      })
-    )
+    students.map(async (student: student) => {
+      if (student.salesforceId === null) {
+        await prisma.student.delete({ where: { id: student.id } })
+      }
+    })
 
-    await Promise.all(
-      parents.map(async (parent: parent) => {
-        if (parent.salesforceId === null) {
-          await prisma.parent.delete({ where: { id: parent.id } })
-        }
-      })
-    )
+    parents.map(async (parent: parent) => {
+      if (parent.salesforceId === null) {
+        await prisma.parent.delete({ where: { id: parent.id } })
+      }
+    })
 
     return
   } catch (error) {
