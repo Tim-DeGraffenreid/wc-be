@@ -129,11 +129,7 @@ export const addStudentsHandler = async (
     //   })
     // }
   } catch (error: any) {
-    console.error('Unexpected Error:', error)
-    res.status(500).json({
-      status: 'error',
-      message: error ? error?.message : 'An unexpected error occurred.',
-    })
+    next(error)
   }
 }
 
