@@ -221,6 +221,34 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
+export const adminLogin = async(req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, password } = req.body
+    const user = await prisma.admin.findFirst({
+      where: { email },
+    })
+    if (!user ||!(await comparePasswords(password, user.password))) {
+      return next(new AppError(400, 'Invalid email or password'))
+    }
+    const { access_token } = await signTokens(user)
+    res.cookie('access_token', access_token, accessTokenCookieOptions)
+    res.cookie('user_type', 'admin', {
+      ...accessTokenCookieOptions,
+      httpOnly: false,
+    })
+    res.cookie('logged_in', true, {
+      ...accessTokenCookieOptions,
+      httpOnly: false,
+    })
+    res.status(200).json({
+      status: 'success',
+      access_token,
+    })
+  } catch (error: any) {
+    next(error)
+  }
+}
+
 export const getMeHandler = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userType, ...rest } = res.locals.user

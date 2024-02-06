@@ -12,7 +12,8 @@ model classes {
   created_at DateTime    @default(now()) @db.Timestamp(6)
   updated_at DateTime    @default(now()) @db.Timestamp(6)
   name       String      @unique(map: "UQ_1f3940af28a76098f31004f03ca") @db.VarChar
-  knowledge  knowledge[]
+  knowledge  student_knowledge[]
+  events     events?
 }
 
 model demographic_info {
@@ -28,28 +29,35 @@ model demographic_info {
   parent             parent?
 }
 
-model knowledge {
+model student_knowledge {
   id         String   @id(map: "PK_4159ba98b65a20a8d1f257bc514") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   created_at DateTime @default(now()) @db.Timestamp(6)
   updated_at DateTime @default(now()) @db.Timestamp(6)
   grade      String?  @db.VarChar
   skills     String?  @db.VarChar
+  // relationships and their connectors
   studentId  String?  @db.Uuid
   classId    String?  @db.Uuid
   student    student? @relation(fields: [studentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_5d9bbc4ee7cf0682ffc455bf0a0")
   classes    classes? @relation(fields: [classId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_6ba1ffbe524f3191da99ebfc4d6")
+  // new columns
+  verify     Boolean  @default(false)
+  verifiedBy admin?   @relation(fields: [adminId], references: [id])
+  verifiedDate DateTime?
+  adminId    String?  @db.Uuid
 }
 
-// model authentication {
-//   id           String            @id() @default("uuid_generate_v4()") @db.Uuid
-//   created_at            DateTime          @default(now()) @db.Timestamp(6)
-//   updated_at            DateTime          @default(now()) @db.Timestamp(6)
-//   email                 String            @unique() @db.VarChar()
-//   phoneNumber           String            @unique() @db.VarChar()
-//   password              String            @db.VarChar
-
-//   @@index([email], map: "auth_email_index")
-// }
+// new table for admin
+model admin {
+  id         String      @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name       String?
+  email      String      @db.VarChar @unique
+  password   String      @db.VarChar
+  created_at DateTime    @default(now()) @db.Timestamp(6)
+  updated_at DateTime    @default(now()) @db.Timestamp(6)
+  knowledge  student_knowledge[]
+  isAdmin    Boolean    @default(false)
+}
 
 model parent {
   id                    String            @id(map: "PK_bf93c41ee1ae1649869ebd05617") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
@@ -72,26 +80,39 @@ model parent {
 }
 
 model student {
-  id          String              @id(map: "PK_3d8016e1cb58429474a3c041904") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  created_at  DateTime            @default(now()) @db.Timestamp(6)
-  updated_at  DateTime            @default(now()) @db.Timestamp(6)
-  email       String              @db.VarChar
-  password    String              @db.VarChar
-  fName       String              @db.VarChar
-  lName       String              @db.VarChar
-  phoneNumber String              @db.VarChar
-  birthday    DateTime            @db.Date
-  grade       grades
-  schoolName  String              @db.VarChar
-  gender      student_gender_enum
-  zipCode     String              @db.VarChar
-  parentId    String?             @db.Uuid
-  knowledge   knowledge[]
-  parent      parent?             @relation(fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d728e971c60c58a818dd9e614ab")
-  salesforceId          String?    @unique() @db.VarChar
-  emergencyContact    String?
-  profileImagePublicId String?
+  id                    String              @id(map: "PK_3d8016e1cb58429474a3c041904") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at            DateTime            @default(now()) @db.Timestamp(6)
+  updated_at            DateTime            @default(now()) @db.Timestamp(6)
+  email                 String              @db.VarChar
+  password              String              @db.VarChar
+  fName                 String              @db.VarChar
+  lName                 String              @db.VarChar
+  phoneNumber           String              @db.VarChar
+  birthday              DateTime            @db.Date
+  grade                 grades
+  schoolName            String              @db.VarChar
+  gender                student_gender_enum
+  zipCode               String              @db.VarChar
+  parentId              String?             @db.Uuid
+  knowledge             student_knowledge[]
+  parent                parent?             @relation(fields: [parentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_d728e971c60c58a818dd9e614ab")
+  salesforceId          String?             @unique() @db.VarChar
+  emergencyContact      String?
+  profileImagePublicId  String?
   profileImageSecureUrl String?
+}
+
+model events {
+  id                    String              @id(map: "PK_3d8017e1cb58429474a3c0419ghgh4") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at            DateTime            @default(now()) @db.Timestamp(6)
+  updated_at            DateTime            @default(now()) @db.Timestamp(6)
+  class                 classes             @relation(fields: [classId], references: [id])
+  classId               String              @db.Uuid @unique
+  class_date            DateTime
+  start_time            DateTime?
+  end_time              DateTime?
+  location              location?
+  instructor            String?
 }
 
 enum student_gender_enum {
@@ -139,4 +160,9 @@ enum housingStatus {
   Rent
   Own
   CurrentlyDisplaced
+}
+
+enum location {
+  InPerson
+  virtual
 }
