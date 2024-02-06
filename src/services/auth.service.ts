@@ -1,8 +1,8 @@
-import { parent, student } from '@prisma/client'
+import { admin, parent, student } from '@prisma/client'
 import redisClient from '../utils/connectRedis'
 import { signJwt } from '../utils/jwt'
 
-export const signTokens = async (user: student | parent) => {
+export const signTokens = async (user: student | parent | admin) => {
   redisClient.set(user.id, JSON.stringify(user), {
     EX: Number(process.env.REDIS_CACHE_EXPIRES_IN) * 60,
   })

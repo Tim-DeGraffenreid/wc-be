@@ -12,8 +12,19 @@ export const loginUserSchema = object({
     }).email('Invalid email address'),
     password: string({
       required_error: 'Password is required',
-    }).min(8, 'Invalid email or password'),
+    }),
     userType: nativeEnum(UserType),
+  }),
+})
+
+export const loginAdminSchema = object({
+  body: object({
+    email: string({
+      required_error: 'Email address is required',
+    }).email('Invalid email address'),
+    password: string({
+      required_error: 'Password is required',
+    }),
   }),
 })
 

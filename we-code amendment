@@ -1,0 +1,49 @@
+[1:59 AM] Hibler, Sedric
+Notes from today's design (for Friday)
+Processes
+
+Student first signs up for wecode and has an account/parent account.
+
+Then the student will be able to pick 1 class for any given saturday and register for it.
+
+On the day of the class, the student should bring the QR code to Wecode.
+
+Wecode will hold a decoder app on a laptop or ipad style device (which secures the signin)
+
+When the qr code is scanned, a page should launch, confirming that the person scanning's data is correct. When confirming the scan, an api is called to store these items in the database.
+
+Table required: student_checkin
+
+fields:
+
+personID / studentId/ userID (name should match the student table)
+
+class_name
+
+checkin_date (formatted)
+
+checkout_date (formatted)
+
+To-do:
+
+Gram has python to generate a QR code today. Can this be converted to javascript? May need to find substitutable libraries to allow this
+
+Create the decoder app and make it available to whoever sits at the front desk of wecode. Store on the web somewhere so that anyone within wecode can access?
+
+Questions to answer:
+
+What if a student loses his/her qr code?
+
+The account should have an email/phone number. It can be emailed to the student as needed.
+
+How do we ensure that the student attended and did infact scan in and attend?
+
+Only wecode staff will have the appropriate decoder to allow the checkin to save.
+
+When the student registers, how do we know what date and class is associated to the qr code?
+
+This is part of the label
+
+What happens if a student forgets to sign in or out?
+
+When validating the qr code, perhaps allow the date field to be modified before it is confirmed.

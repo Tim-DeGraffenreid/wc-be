@@ -40,7 +40,7 @@ export const findStudentById = async (userId: string) => {
 }
 
 export const addToClass = async (id: string, classId: string) => {
-  const knowledge = await prisma.knowledge.create({
+  const knowledge = await prisma.student_knowledge.create({
     data: {
       student: {
         connect: { id },
@@ -76,7 +76,7 @@ export const updateStudent = async (student: student, requestData: Partial<stude
 }
 
 export const getStudentClasses = async (id: string) => {
-  return await prisma.knowledge.findMany({ where: { studentId: id } })
+  return await prisma.student_knowledge.findMany({ where: { studentId: id } })
 }
 
 export const findStudentByDetails = async (data: any) => {
@@ -96,7 +96,7 @@ export const findStudentByDetails = async (data: any) => {
 }
 
 export const deleteStudent = async (id: string) => {
-  const delKnowledge = prisma.knowledge.deleteMany({ where: { studentId: id } })
+  const delKnowledge = prisma.student_knowledge.deleteMany({ where: { studentId: id } })
   const delStudent = prisma.student.delete({ where: { id } })
 
   return await prisma.$transaction([delKnowledge, delStudent])

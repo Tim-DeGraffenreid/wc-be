@@ -116,7 +116,7 @@ export const getParentChild = async (parentId: string, childId: string) => {
 }
 
 export const addChildToClass = async (student: student, classId: string) => {
-  const knowledge = await prisma.knowledge.create({
+  const knowledge = await prisma.student_knowledge.create({
     data: {
       student: {
         connect: { id: student.id },
