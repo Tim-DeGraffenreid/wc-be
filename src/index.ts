@@ -14,6 +14,7 @@ import cron from 'node-cron'
 import parentRouter from './routes/parents.route'
 import studentRouter from './routes/students.route'
 import authRouter from './routes/auth.route'
+import adminRouter from './routes/admin.route'
 import classRouter from './routes/class.route'
 import AppError from './utils/appError'
 import redisClient, { connectRedis } from './utils/connectRedis'
@@ -38,6 +39,7 @@ connectRedis()
     app.use('/api/class', classRouter)
     app.use('/api/parents', parentRouter)
     app.use('/api/students', studentRouter)
+    app.use('/api/admin', adminRouter)
 
     // CronJobs
     cron.schedule('*/1 * * * *', async () => {

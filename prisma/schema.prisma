@@ -50,8 +50,9 @@ model student_knowledge {
 // new table for admin
 model admin {
   id         String      @id() @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name       String?
+  name       String      @db.VarChar
   email      String      @db.VarChar @unique
+  phoneNumber String?            @db.VarChar
   password   String      @db.VarChar
   created_at DateTime    @default(now()) @db.Timestamp(6)
   updated_at DateTime    @default(now()) @db.Timestamp(6)
