@@ -4,7 +4,7 @@ import redisClient from '../utils/connectRedis'
 import { verifyJwt } from '../utils/jwt'
 import prisma from '../utils/prisma'
 
-type UserType = 'student' | 'parent'
+type UserType = 'student' | 'parent' | 'admin'
 
 export const deserializeUser = async (
   req: Request,
@@ -45,8 +45,12 @@ export const deserializeUser = async (
       user = await prisma.parent.findUnique({
         where: { id: JSON.parse(session).id },
       })
-    } else {
+    } else if (userType === 'student') {
       user = await prisma.student.findUnique({
+        where: { id: JSON.parse(session).id },
+      })
+    } else {
+      user = await prisma.admin.findUnique({
         where: { id: JSON.parse(session).id },
       })
     }

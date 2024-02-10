@@ -1,5 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
-import { addAdmin, deleteAdmin, updateAdmin } from '../services/admin.service'
+import {
+  addAdmin,
+  checkIfSuperAdmin,
+  deleteAdmin,
+  findAdminByDetails,
+  updateAdmin,
+} from '../services/admin.service'
+import AppError from '../utils/appError'
 
 export const createAdminController = async (
   req: Request,
@@ -7,11 +14,16 @@ export const createAdminController = async (
   next: NextFunction
 ) => {
   try {
-    const admin = await addAdmin(req.body)
-    res.status(201).json({
-      status: 'success',
-      data: admin,
-    })
+    const { id } = res.locals.user
+    if (await checkIfSuperAdmin(id)) {
+      const admin = await addAdmin(req.body)
+      res.status(201).json({
+        status: 'success',
+        data: admin,
+      })
+    } else {
+      throw new AppError(400, 'You are not authorized to perform this action')
+    }
   } catch (error) {
     next(error)
   }
@@ -47,6 +59,26 @@ export const deleteAdminController = async (
     res.status(204).json({
       status: 'success',
       data: admin,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const forgotPasswordHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { name, password, phoneNumber } = req.body
+
+    const admin = await findAdminByDetails({ name, phoneNumber })
+    const updatedAdmin = await updateAdmin(admin.id, { password })
+
+    res.status(201).json({
+      status: 'success',
+      data: updatedAdmin,
     })
   } catch (error) {
     next(error)
