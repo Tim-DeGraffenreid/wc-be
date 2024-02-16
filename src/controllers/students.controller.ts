@@ -12,6 +12,7 @@ import AppError from '../utils/appError'
 import { findClassById } from '../services/class.service'
 import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
 import { uploadImage } from '../services/cloudinary.service'
+import { generateQRCode } from '../utils/qr_generator'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -137,6 +138,9 @@ export const addToClassHandler = async (
     }
 
     await addToClass(res.locals.user.id, getClass.id, date)
+    const qrCode = await generateQRCode({ studentId: res.locals.user.id, classId, date })
+
+    console.log(qrCode)
 
     res.status(201).json({
       status: 'success',
