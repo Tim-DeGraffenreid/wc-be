@@ -43,6 +43,15 @@ export const findAdminByDetails = (data: any) => {
   return prisma.admin.findFirstOrThrow({ where: { name, phoneNumber } })
 }
 
-export const updateAdminPassword = async (id: string, password: string) => {
-  
+export const getUpcomingClasses = () => {
+  return prisma.student_knowledge.findMany({
+    where: {
+      date: {
+        gte: new Date(),
+      },
+    },
+    orderBy: {
+      date: 'asc',
+    },
+  })
 }

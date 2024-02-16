@@ -78,3 +78,13 @@ export const updateParentSchema = object({
 export const deleteParentSchema = object({
   ...params,
 })
+
+export const addToClassSchema = object({
+  params: object({
+    studentId: string(),
+    classId: string(),
+  }),
+  body: object({
+    date: string({ required_error: 'date is required' }).regex(/^\d{4}-\d{2}-\d{2}$/),
+  }),
+})

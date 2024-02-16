@@ -4,6 +4,7 @@ import {
   checkIfSuperAdmin,
   deleteAdmin,
   findAdminByDetails,
+  getUpcomingClasses,
   updateAdmin,
 } from '../services/admin.service'
 import AppError from '../utils/appError'
@@ -79,6 +80,23 @@ export const forgotPasswordHandler = async (
     res.status(201).json({
       status: 'success',
       data: updatedAdmin,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getUpcomingClassesHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const upcomingClasses = await getUpcomingClasses()
+
+    res.status(200).json({
+      status: 'success',
+      data: upcomingClasses,
     })
   } catch (error) {
     next(error)

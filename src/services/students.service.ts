@@ -39,7 +39,7 @@ export const findStudentById = async (userId: string) => {
   return await prisma.student.findUniqueOrThrow({ where: { id: userId } })
 }
 
-export const addToClass = async (id: string, classId: string) => {
+export const addToClass = async (id: string, classId: string, date: Date) => {
   const knowledge = await prisma.student_knowledge.create({
     data: {
       student: {
@@ -48,6 +48,7 @@ export const addToClass = async (id: string, classId: string) => {
       classes: {
         connect: { id: classId },
       },
+      date,
     },
   })
 

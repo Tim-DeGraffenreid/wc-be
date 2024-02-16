@@ -10,7 +10,11 @@ import {
   updateStudentImageHandler,
 } from '../controllers/students.controller'
 import { validate } from '../middlewares/validate'
-import { studentSchema, updateStudentSchema } from '../schemas/student.schema'
+import {
+  addToClassSchema,
+  studentSchema,
+  updateStudentSchema,
+} from '../schemas/student.schema'
 import { deserializeUser } from '../middlewares/deserializeUser'
 import { requireUser } from '../middlewares/requireUser'
 import upload from '../middlewares/multer'
@@ -29,7 +33,9 @@ router
   .delete(deleteStudentHandler)
 router
   .route('/add-to-class/:classId')
-  .post(deserializeUser, requireUser, addToClassHandler)
-router.route('/image').post(deserializeUser, requireUser, upload.single('profile'), updateStudentImageHandler)
+  .post(deserializeUser, requireUser, validate(addToClassSchema), addToClassHandler)
+router
+  .route('/image')
+  .post(deserializeUser, requireUser, upload.single('profile'), updateStudentImageHandler)
 
 export default router

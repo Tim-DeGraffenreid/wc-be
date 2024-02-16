@@ -226,6 +226,7 @@ export const addChildToClassHandler = async (
   try {
     const { id } = res.locals.user
     const { studentId, classId } = req.params
+    const { date } = req.body
 
     const student = await getParentChild(id, studentId)
     const getClass = await findClassById(classId)
@@ -234,7 +235,11 @@ export const addChildToClassHandler = async (
       return res.status(404).json({ error: 'Student or class not found' })
     }
 
-    await addChildToClass(student, classId)
+    if (date < new Date()) {
+      return res.status(400).json({ error: 'Date cannot be in the past' })
+    }
+
+    await addChildToClass(student, classId, date)
 
     res.status(201).json({
       status: 'success',
