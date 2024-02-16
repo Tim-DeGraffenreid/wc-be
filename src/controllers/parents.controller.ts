@@ -20,6 +20,7 @@ import {
 } from '../services/salesforce.service'
 import { findStudentById, updateStudent } from '../services/students.service'
 import { deleteImage, uploadImage } from '../services/cloudinary.service'
+import { generateQRCode } from '../utils/qr_generator'
 
 export const getParentsHandler = async (
   req: Request,
@@ -240,6 +241,9 @@ export const addChildToClassHandler = async (
     }
 
     await addChildToClass(student, classId, date)
+    const qrCode = await generateQRCode({ studentId, classId, date })
+
+    console.log(qrCode)
 
     res.status(201).json({
       status: 'success',

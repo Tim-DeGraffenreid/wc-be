@@ -2,7 +2,7 @@ import QRCode from 'qrcode'
 
 export const generateQRCode = async (data: {
   studentId: string
-  class: string
+  classId: string
   date: string
 }) => {
   QRCode.toDataURL(JSON.stringify(data), (err, url) => {
