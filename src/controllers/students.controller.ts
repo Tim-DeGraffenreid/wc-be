@@ -124,6 +124,7 @@ export const addToClassHandler = async (
 ) => {
   try {
     const { classId } = req.params
+    const { date } = req.body
 
     const getClass = await findClassById(classId)
 
@@ -131,7 +132,11 @@ export const addToClassHandler = async (
       return res.status(404).json({ error: 'Class not found' })
     }
 
-    await addToClass(res.locals.user.id, getClass.id)
+    if (date < new Date()) {
+      return res.status(400).json({ error: 'Date cannot be in the past' })
+    }
+
+    await addToClass(res.locals.user.id, getClass.id, date)
 
     res.status(201).json({
       status: 'success',

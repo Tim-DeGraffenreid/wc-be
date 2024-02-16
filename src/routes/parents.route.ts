@@ -13,6 +13,7 @@ import {
 } from '../controllers/parents.controller'
 import { validate } from '../middlewares/validate'
 import {
+  addToClassSchema,
   deleteParentSchema,
   demographicInfoSchema,
   getParentSchema,
@@ -46,7 +47,7 @@ router
   .post(validate(studentSchema), deserializeUser, requireUser, addStudentsHandler)
 router
   .route('/add-to-class/:studentId/:classId')
-  .post(deserializeUser, requireUser, addChildToClassHandler)
+  .post(deserializeUser, requireUser, validate(addToClassSchema), addChildToClassHandler)
 router
   .route('/:studentId/image')
   .post(deserializeUser, requireUser, upload.single('profile'), addChildImageHandler)

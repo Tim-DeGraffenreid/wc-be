@@ -60,3 +60,12 @@ export const updateStudentSchema = object({
 export const deleteStudentSchema = object({
   ...params,
 })
+
+export const addToClassSchema = object({
+  params: object({
+    classId: string(),
+  }),
+  body: object({
+    date: string({ required_error: 'date is required' }).regex(/^\d{4}-\d{2}-\d{2}$/),
+  }),
+})

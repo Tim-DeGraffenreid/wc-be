@@ -2,6 +2,7 @@ import express from 'express'
 import {
   createAdminController,
   forgotPasswordHandler,
+  getUpcomingClassesHandler,
 } from '../controllers/admin.controller'
 import { validate } from '../middlewares/validate'
 import { adminSchema, forgotPasswordSchema } from '../schemas/admin.schema'
@@ -16,5 +17,8 @@ router
 router
   .route('/new')
   .post(validate(adminSchema), deserializeUser, requireUser, createAdminController)
+router
+  .route('/upcoming-classes')
+  .get(deserializeUser, requireUser, getUpcomingClassesHandler)
 
 export default router
