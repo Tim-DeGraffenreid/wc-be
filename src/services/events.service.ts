@@ -16,3 +16,11 @@ export const getEvents = async () => {
     throw error
   }
 }
+
+export const deleteEvent = async (id: string) => {
+  try {
+    return await prisma.events.delete({ where: { id } })
+  } catch (error) {
+    throw error
+  }
+}

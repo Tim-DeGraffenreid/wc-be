@@ -108,9 +108,11 @@ model events {
   updated_at            DateTime            @default(now()) @db.Timestamp(6)
   class                 classes             @relation(fields: [classId], references: [id])
   classId               String              @db.Uuid @unique
-  start_time            DateTime?
-  end_time              DateTime?
-  location              location?
+
+  start_time            DateTime
+  end_time              DateTime
+  event_date            DateTime
+  location              String
   instructor            String?
 }
 
@@ -161,7 +163,7 @@ enum housingStatus {
   CurrentlyDisplaced
 }
 
-enum location {
-  InPerson
-  virtual
-}
+// enum location {
+//   inPerson
+//   virtual
+// }

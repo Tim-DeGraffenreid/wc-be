@@ -9,10 +9,13 @@ export const createEventSchema = object({
   body: object({
     start_time: string({
       required_error: 'Start time is required',
-    }).datetime('Start time must be in the future'),
+    }).datetime(),
     end_time: string({
       required_error: 'End time is required',
-    }).datetime('End time must be after start time'),
+    }).datetime(),
+    event_date: string({
+      required_error: 'Event date is required',
+    }).datetime(),
     location: string({
       required_error: 'Location is required',
     }),
