@@ -1,7 +1,7 @@
 import prisma from '../utils/prisma'
 import { classes } from '@prisma/client'
 
-export const getCLasses = async () => {
+export const getClasses = async () => {
   return await prisma.classes.findMany()
 }
 

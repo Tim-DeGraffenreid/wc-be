@@ -3,7 +3,7 @@ import {
   addClass,
   deleteClass,
   findClassById,
-  getCLasses,
+  getClasses,
   updateClass,
 } from '../services/class.service'
 import AppError from '../utils/appError'
@@ -14,10 +14,10 @@ export const getClassesHandler = async (
   next: NextFunction
 ) => {
   try {
-    const parents = await getCLasses()
+    const classes = await getClasses()
     res.status(200).json({
       status: 'success',
-      parents,
+      classes,
     })
   } catch (error) {
     next(error)
