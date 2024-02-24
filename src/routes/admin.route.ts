@@ -3,10 +3,15 @@ import {
   createAdminController,
   forgotPasswordHandler,
   getUpcomingClassesHandler,
+  verifyStudentHandler,
 } from '../controllers/admin.controller'
 import { validate } from '../middlewares/validate'
-import { adminSchema, forgotPasswordSchema } from '../schemas/admin.schema'
-import { requireUser } from '../middlewares/requireUser'
+import {
+  adminSchema,
+  forgotPasswordSchema,
+  verifyStudentSchema,
+} from '../schemas/admin.schema'
+import { checkIfAdmin } from '../middlewares/requireUser'
 import { deserializeUser } from '../middlewares/deserializeUser'
 
 const router = express.Router()
@@ -16,9 +21,17 @@ router
   .post(validate(forgotPasswordSchema), forgotPasswordHandler)
 router
   .route('/new')
-  .post(validate(adminSchema), deserializeUser, requireUser, createAdminController)
+  .post(validate(adminSchema), deserializeUser, checkIfAdmin, createAdminController)
 router
   .route('/upcoming-classes')
-  .get(deserializeUser, requireUser, getUpcomingClassesHandler)
+  .get(deserializeUser, checkIfAdmin, getUpcomingClassesHandler)
+router
+  .route('/verify-student')
+  .post(
+    deserializeUser,
+    checkIfAdmin,
+    validate(verifyStudentSchema),
+    verifyStudentHandler
+  )
 
 export default router

@@ -16,3 +16,11 @@ export const forgotPasswordSchema: AnyZodObject = object({
     password: string({ required_error: 'password is required' }).min(8),
   }),
 })
+
+export const verifyStudentSchema: AnyZodObject = object({
+  body: object({
+    studentId: string({ required_error: 'studentId is required' }),
+    classId: string({ required_error: 'classId is required' }),
+    date: string({ required_error: 'date is required' }).regex(/^\d{4}-\d{2}-\d{2}$/),
+  }),
+})
