@@ -4,8 +4,10 @@ import {
   checkIfSuperAdmin,
   deleteAdmin,
   findAdminByDetails,
+  findAdminById,
   getUpcomingClasses,
   updateAdmin,
+  verifyStudent,
 } from '../services/admin.service'
 import AppError from '../utils/appError'
 
@@ -97,6 +99,29 @@ export const getUpcomingClassesHandler = async (
     res.status(200).json({
       status: 'success',
       data: upcomingClasses,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const verifyStudentHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { studentId, classId, date } = req.body
+    const { id } = res.locals.user
+
+    await findAdminById(id)
+
+    const updatedData = await verifyStudent({ studentId, classId, date }, id)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Student verified successfully',
+      data: updatedData,
     })
   } catch (error) {
     next(error)
