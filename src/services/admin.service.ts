@@ -74,6 +74,7 @@ export const verifyStudent = (
     },
     data: {
       adminId: verificatorId,
+      verify: true,
     },
     select: {
       classes: true,
