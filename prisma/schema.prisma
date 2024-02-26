@@ -13,7 +13,7 @@ model classes {
   updated_at DateTime    @default(now()) @db.Timestamp(6)
   name       String      @unique(map: "UQ_1f3940af28a76098f31004f03ca") @db.VarChar
   knowledge  student_knowledge[]
-  events     events?
+  events     events[]
 }
 
 model demographic_info {
