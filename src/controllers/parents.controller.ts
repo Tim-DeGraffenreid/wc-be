@@ -241,7 +241,13 @@ export const addChildToClassHandler = async (
     }
 
     await addChildToClass(student, classId, date)
-    const qrCode = await generateQRCode({ studentId, classId, date })
+    const qrCode = await generateQRCode({
+      studentId,
+      classId,
+      date,
+      studentName: `${student.fName} ${student.lName}`,
+      className: getClass.name,
+    })
 
     console.log(qrCode)
 
