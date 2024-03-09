@@ -64,13 +64,24 @@ export const getUpcomingClasses = () => {
   })
 }
 
-export const verifyStudent = (
+export const verifyStudent = async (
   verificationData: { date: string; studentId: string; classId: string },
   verificatorId: string
 ) => {
+  const { date, studentId, classId } = verificationData
+  const knowledgeData = await prisma.student_knowledge.findFirst({
+    where: {
+      studentId,
+      classId,
+      date: {
+        equals: new Date(date),
+      },
+    },
+  })
+
   return prisma.student_knowledge.update({
     where: {
-      date: verificationData.date,
+      id: knowledgeData?.id,
     },
     data: {
       adminId: verificatorId,

@@ -13,6 +13,7 @@ import { findClassById } from '../services/class.service'
 import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
 import { uploadImage } from '../services/cloudinary.service'
 import { generateQRCode } from '../utils/qr_generator'
+import { checkClassScheduledForDay } from '../services/knowledge.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -131,6 +132,12 @@ export const addToClassHandler = async (
 
     if (!getClass) {
       return res.status(404).json({ error: 'Class not found' })
+    }
+
+    const checkClassScheduled = await checkClassScheduledForDay(res.locals.user.id, date)
+
+    if (checkClassScheduled) {
+      return res.status(400).json({ error: 'Class already scheduled for that date' })
     }
 
     if (date < new Date()) {
