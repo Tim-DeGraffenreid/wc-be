@@ -40,6 +40,15 @@ export const findStudentById = async (userId: string) => {
 }
 
 export const addToClass = async (id: string, classId: string, date: Date) => {
+  // if (date.getDay() !== 6) {
+  //   throw new Error('Date must be a Saturday')
+  // }
+
+  // const currentDate = new Date()
+  // if (date < currentDate) {
+  //   throw new Error('Date cannot be in the past')
+  // }
+
   const knowledge = await prisma.student_knowledge.create({
     data: {
       student: {

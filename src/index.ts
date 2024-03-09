@@ -24,7 +24,6 @@ import {
   handleParentToChildren,
   syncDatabaseAndSalesforce,
 } from './services/salesforce.service'
-import prisma from './utils/prisma'
 
 connectRedis()
   .then(async () => {
@@ -76,15 +75,6 @@ connectRedis()
       res.status(200).json({
         status: 'success',
         message,
-      })
-    })
-
-    app.get('/api/knowledge', async (_req: Request, res: Response) => {
-      const knowledges = await prisma.student_knowledge.findMany()
-
-      res.status(200).json({
-        status: 'success',
-        knowledges,
       })
     })
 

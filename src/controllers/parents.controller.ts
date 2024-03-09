@@ -21,6 +21,7 @@ import {
 import { findStudentById, updateStudent } from '../services/students.service'
 import { deleteImage, uploadImage } from '../services/cloudinary.service'
 import { generateQRCode } from '../utils/qr_generator'
+import { checkClassScheduledForDay } from '../services/knowledge.service'
 
 export const getParentsHandler = async (
   req: Request,
@@ -234,6 +235,12 @@ export const addChildToClassHandler = async (
 
     if (!student || !getClass) {
       return res.status(404).json({ error: 'Student or class not found' })
+    }
+
+    const checkClassScheduled = await checkClassScheduledForDay(studentId, date)
+
+    if (checkClassScheduled) {
+      return res.status(400).json({ error: 'Class already scheduled for that date' })
     }
 
     if (date < new Date()) {
