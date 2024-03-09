@@ -24,3 +24,15 @@ export const deleteEvent = async (id: string) => {
     throw error
   }
 }
+
+export const checkEventsScheduledForDay = async (start_time: string, date: Date) => {
+  const existingEvent = await prisma.events.findFirst({
+    where: {
+      event_date: {
+        equals: date,
+      },
+      start_time,
+    },
+  })
+  return !!existingEvent
+}
