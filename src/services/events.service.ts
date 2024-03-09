@@ -29,9 +29,11 @@ export const checkEventsScheduledForDay = async (start_time: string, date: Date)
   const existingEvent = await prisma.events.findFirst({
     where: {
       event_date: {
-        equals: date,
+        equals: new Date(date),
       },
-      start_time,
+      start_time: {
+        equals: new Date(start_time),
+      },
     },
   })
   return !!existingEvent
