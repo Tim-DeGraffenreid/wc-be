@@ -66,6 +66,6 @@ export const addToClassSchema = object({
     classId: string(),
   }),
   body: object({
-    date: string({ required_error: 'date is required' }).regex(/^\d{4}-\d{2}-\d{2}$/),
+    date: string({ required_error: 'date is required' }).datetime(),
   }),
 })
