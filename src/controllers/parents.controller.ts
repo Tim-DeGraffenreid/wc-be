@@ -261,6 +261,7 @@ export const addChildToClassHandler = async (
     res.status(201).json({
       status: 'success',
       message: 'Student added to class successfully',
+      qrCode,
     })
   } catch (error) {
     next(error)

@@ -48,7 +48,7 @@ export const updateStudentSchema = object({
     phoneNumber: string(),
     birthday: string({
       required_error: 'birthday is required',
-    }).regex(/^\d{4}-\d{2}-\d{2}$/),
+    }).datetime(),
     grade: nativeEnum(grades),
     schoolName: string({ required_error: 'schoolName is required' }),
     gender: nativeEnum(student_gender_enum),
