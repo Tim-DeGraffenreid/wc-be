@@ -1,32 +1,32 @@
 import { CookieOptions, NextFunction, Request, Response } from 'express'
-import AppError from '../utils/appError'
+import { generateVerifyEmailToken, signTokens } from '../services/auth.service'
+import { sendConfirmationEmail } from '../services/mail.service'
 import {
   changeParentPassword,
   createParent,
   findParentByEmail,
   updateParent,
 } from '../services/parents.service'
-import { generateVerifyEmailToken, signTokens } from '../services/auth.service'
+import {
+  addParentToSalesforce,
+  addStudentToSalesforce,
+} from '../services/salesforce.service'
 import {
   createStudent,
   findStudentByDetails,
   findStudentByEmail,
   updateStudent,
 } from '../services/students.service'
-import { comparePasswords } from '../utils/password.manager'
-import prisma from '../utils/prisma'
-import {
-  addParentToSalesforce,
-  addStudentToSalesforce,
-} from '../services/salesforce.service'
-import { sendConfirmationEmail } from '../services/mail.service'
+import AppError from '../utils/appError'
 import redisClient from '../utils/connectRedis'
 import { verifyJwt } from '../utils/jwt'
+import { comparePasswords } from '../utils/password.manager'
+import prisma from '../utils/prisma'
 
 const accessTokenExpiresInMinutes = Number(process.env.ACCESS_TOKEN_EXPIRES_IN)
-if (isNaN(accessTokenExpiresInMinutes)) {
-  throw new Error('Invalid ACCESS_TOKEN_EXPIRES_IN value')
-}
+// if (isNaN(accessTokenExpiresInMinutes)) {
+//   throw new Error('Invalid ACCESS_TOKEN_EXPIRES_IN value')
+// }
 
 const cookiesOptions: CookieOptions = {
   httpOnly: true,
@@ -221,13 +221,13 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   }
 }
 
-export const adminLogin = async(req: Request, res: Response, next: NextFunction) => {
+export const adminLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body
     const user = await prisma.admin.findFirst({
       where: { email },
     })
-    if (!user ||!(await comparePasswords(password, user.password))) {
+    if (!user || !(await comparePasswords(password, user.password))) {
       return next(new AppError(400, 'Invalid email or password'))
     }
     const { access_token } = await signTokens(user)
