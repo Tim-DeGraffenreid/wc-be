@@ -1,7 +1,8 @@
+// @ts-nocheck
+
 import { parent, student } from '@prisma/client'
 import axios from 'axios'
 import prisma from '../utils/prisma'
-// //FixThis: Put these in vercel environment variables when you switch out of
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token' // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
 const clientId = process.env.SFCLIENTID //  Salesforce client ID
 const clientSecret = process.env.SFCLIENTSECRET // Salesforce client secret

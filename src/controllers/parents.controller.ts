@@ -1,5 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
-import AppError from '../utils/appError'
+import { findClassById } from '../services/class.service'
+import { deleteImage, uploadImage } from '../services/cloudinary.service'
+import { checkClassScheduledForDay } from '../services/knowledge.service'
 import {
   addChildToClass,
   addDemographic,
@@ -12,16 +14,14 @@ import {
   getStudents,
   updateParent,
 } from '../services/parents.service'
-import { findClassById } from '../services/class.service'
 import {
   addStudentToSalesforce,
   deleteUser,
   updateParentSalesforce,
 } from '../services/salesforce.service'
 import { findStudentById, updateStudent } from '../services/students.service'
-import { deleteImage, uploadImage } from '../services/cloudinary.service'
+import AppError from '../utils/appError'
 import { generateQRCode } from '../utils/qr_generator'
-import { checkClassScheduledForDay } from '../services/knowledge.service'
 
 export const getParentsHandler = async (
   req: Request,
@@ -75,7 +75,7 @@ export const deleteParentHandler = async (
 
     const deleteParentFromSalesforce = await deleteUser(parent.salesforceId!, 'parent')
     if (deleteParentFromSalesforce) {
-      const deleteStudentPromises = students.map(async (student) => {
+      const deleteStudentPromises = students.map(async (student: any) => {
         await deleteUser(student.salesforceId!, 'student')
       })
 

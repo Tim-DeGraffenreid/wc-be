@@ -1,6 +1,6 @@
+import { Prisma, student } from '@prisma/client'
 import { hashPassword } from '../utils/password.manager'
 import prisma from '../utils/prisma'
-import { Prisma, student } from '@prisma/client'
 
 export const getStudents = async () => {
   return await prisma.student.findMany({ include: { knowledge: true } })
@@ -16,7 +16,7 @@ export const createStudent = async (data: student) => {
       },
     })
     return { success: true, data: student }
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return { success: false, message: 'Email or phone number is already in use.' }
