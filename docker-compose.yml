@@ -9,6 +9,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - wecode
     environment:
       PORT: 3010
       NODE_ENV: production
@@ -30,6 +32,7 @@ services:
       EMAIL_PORT: 587
       DEFAULT_FROM_EMAIL: devteam@wecodekc.org
       DATABASE_URL: postgresql://wecode:wecode123@db:5432/wecode
+      REDIS_URL: redis://redis:6379
   db:
     image: postgres
     restart: always
@@ -42,6 +45,8 @@ services:
     volumes:
       - dbdata:/var/lib/postgresql/data
       - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+    networks:
+      - wecode
   redis:
     image: redis
     container_name: redis-server
@@ -50,10 +55,10 @@ services:
       - '6379:6379'
     volumes:
       - redisdata:/data
-  nodejs:
-    build: .
-    environment:
-      DATABASE_URL: postgresql://wecode:wecode123@db:5432/wecode
+    networks:
+      - wecode
 volumes:
   dbdata:
   redisdata:
+networks:
+  wecode:

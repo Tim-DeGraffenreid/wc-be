@@ -15,6 +15,7 @@ declare global {
       SFPASSWORD: string
       SFSECURITYTOKEN: string
       DATABASE_URL: string
+      REDIS_URL: string
       SFCLIENTID: string
       SFCLIENTSECRET: string
       EMAIL_HOST: string
