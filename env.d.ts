@@ -5,7 +5,6 @@ declare global {
     interface ProcessEnv {
       PORT: number
       NODE_ENV: string
-      DATABASE_URL: string
       ACCESS_TOKEN_EXPIRES_IN: number
       REDIS_CACHE_EXPIRES_IN: number
       JWT_TOKEN: string
@@ -15,6 +14,7 @@ declare global {
       SFUSERNAME: string
       SFPASSWORD: string
       SFSECURITYTOKEN: string
+      DATABASE_URL: string
       SFCLIENTID: string
       SFCLIENTSECRET: string
       EMAIL_HOST: string
