@@ -50,6 +50,10 @@ services:
       - '6379:6379'
     volumes:
       - redisdata:/data
+  nodejs:
+    build: .
+    environment:
+      DATABASE_URL: postgresql://wecode:wecode123@db:5432/wecode
 volumes:
   dbdata:
   redisdata:
