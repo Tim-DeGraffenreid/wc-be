@@ -1,18 +1,26 @@
-import { createClient } from 'redis'
+import redis from 'redis'
 
 const redisUrl = 'redis://localhost:6379'
 
-const redisClient = createClient({
+const redisClient = redis.createClient({
   url: redisUrl,
 })
 
 export const connectRedis = async () => {
   try {
-    await redisClient.connect()
-    console.log('⚡[redis]: Redis client connected successfully')
-    redisClient.set('try', 'Hello Welcome to Wecode')
+    await new Promise<void>((resolve, reject) => {
+      redisClient.on('connect', () => {
+        console.log('⚡[redis]: Redis client connected successfully')
+        resolve()
+      })
+
+      redisClient.on('error', (error) => {
+        console.error('Error connecting to Redis:', error)
+        reject(error)
+      })
+    })
   } catch (error) {
-    console.log(error)
+    console.error('Error connecting to Redis:', error)
     setTimeout(connectRedis, 5000)
   }
 }
