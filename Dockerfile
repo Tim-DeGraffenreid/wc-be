@@ -8,6 +8,7 @@ FROM node:20-alpine
 #         python3 \
 #         python3-dev \
 #         py3-pip
+RUN mkdir -p /usr/src/wecode
 
 # Create wecode directory
 WORKDIR /usr/src/wecode
