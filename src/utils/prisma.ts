@@ -23,7 +23,7 @@ const createSuperAdmin = async () => {
     } else {
       console.log('Super admin already exists')
     }
-  } catch (error) {
+  } catch (error: any) {
     console.log('Error creating super admin', error)
   }
 }
@@ -34,7 +34,7 @@ prisma
     console.log('Connected to database')
     createSuperAdmin()
   })
-  .catch((error) => {
+  .catch((error: any) => {
     console.log('Error connecting to database', error)
   })
 

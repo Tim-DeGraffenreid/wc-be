@@ -25,11 +25,11 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-# Run build script
-RUN npm run build
-
 # Generate Prisma client
 RUN npx prisma generate
+
+# Run build script
+RUN npm run build
 
 # Expose port and start application
 EXPOSE 3000

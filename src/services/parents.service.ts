@@ -16,7 +16,7 @@ export const createParent = async (data: Prisma.parentCreateInput) => {
     })
 
     return { success: true, data: parent }
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       if (error.code === 'P2002') {
         return { success: false, message: 'Email or phone number is already in use.' }
@@ -64,7 +64,7 @@ export const createNewStudent = async (studentData: student, parentId: string) =
     })
 
     return student
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
       throw new Error('A student with the provided data already exists.')
     }
@@ -158,7 +158,7 @@ export const deleteParent = async (id: string) => {
     const delParent = prisma.parent.delete({ where: { id } })
 
     return await prisma.$transaction([delStudents, delParent])
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error deleting parent:', error)
     return { success: false, message: 'An error occurred while deleting the parent.' }
   }
