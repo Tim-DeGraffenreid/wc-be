@@ -10,19 +10,11 @@ const redisClient = createClient({
 
 export const connectRedis = async () => {
   try {
-    await new Promise<void>((resolve, reject) => {
-      redisClient.on('connect', () => {
-        console.log('⚡[redis]: Redis client connected successfully')
-        resolve()
-      })
-
-      redisClient.on('error', (error) => {
-        console.error('Error connecting to Redis:', error)
-        reject(error)
-      })
-    })
+    await redisClient.connect()
+    console.log('⚡[redis]: Redis client connected successfully')
+    redisClient.set('try', 'Hello Welcome to Wecode')
   } catch (error) {
-    console.error('Error connecting to Redis:', error)
+    console.log(error)
     setTimeout(connectRedis, 5000)
   }
 }
