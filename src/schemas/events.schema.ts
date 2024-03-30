@@ -24,3 +24,18 @@ export const createEventSchema = object({
     }),
   }),
 })
+
+export const updateEventSchema = object({
+  params: object({
+    id: string({
+      required_error: 'Event id is required',
+    }),
+  }),
+  body: object({
+    start_time: string().datetime(),
+    end_time: string().datetime(),
+    event_date: string().datetime(),
+    location: string(),
+    instructor: string(),
+  }).partial(),
+})

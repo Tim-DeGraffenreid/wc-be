@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
+import { findClassById } from '../services/class.service'
 import {
   checkEventsScheduledForDay,
   createEvent,
   deleteEvent,
   getEvents,
+  updateEvent,
 } from '../services/events.service'
-import { findClassById } from '../services/class.service'
 
 export const createEventhandler = async (
   req: Request,
@@ -61,6 +62,24 @@ export const deleteEventHandler = async (
     const event = await deleteEvent(id)
 
     res.status(204).json({
+      status: 'success',
+      data: event,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const updateEventHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+    const event = await updateEvent(id, req.body)
+
+    res.status(200).json({
       status: 'success',
       data: event,
     })

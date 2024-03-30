@@ -38,3 +38,11 @@ export const checkEventsScheduledForDay = async (start_time: string, date: Date)
   })
   return !!existingEvent
 }
+
+export const updateEvent = async (id: string, data: Prisma.eventsUpdateInput) => {
+  try {
+    return await prisma.events.update({ where: { id }, data })
+  } catch (error) {
+    throw error
+  }
+}
