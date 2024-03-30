@@ -1,10 +1,11 @@
 import { createClient } from 'redis'
 
-// const redisUrl = 'redis://localhost:6379'
-const redisUrl = process.env.REDIS_URL
-
 const redisClient = createClient({
-  url: redisUrl,
+  password: 'VrMDd6Xwxu4kpNQDwYudS9TeofGdfI8D',
+  socket: {
+    host: 'redis-14837.c302.asia-northeast1-1.gce.cloud.redislabs.com',
+    port: 14837,
+  },
 })
 
 export const connectRedis = async () => {
