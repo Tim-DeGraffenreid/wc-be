@@ -7,7 +7,7 @@ export const generateQRCode = async (data: {
   studentName: string
   className: string
 }) => {
-  QRCode.toDataURL(JSON.stringify(data), (err, url) => {
+  QRCode.toDataURL(JSON.stringify(data), (err: any, url: any) => {
     if (err) throw err
     console.log(url)
     return url
