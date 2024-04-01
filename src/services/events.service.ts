@@ -11,7 +11,11 @@ export const createEvent = async (data: Prisma.eventsCreateInput) => {
 
 export const getEvents = async () => {
   try {
-    return await prisma.events.findMany()
+    return await prisma.events.findMany({
+      include: {
+        class: true,
+      },
+    })
   } catch (error) {
     throw error
   }
