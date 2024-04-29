@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
-import prisma from '../utils/prisma'
 import { hashPassword } from '../utils/password.manager'
+import prisma from '../utils/prisma'
 
 export const addAdmin = async (data: Prisma.adminCreateInput) => {
   try {
@@ -90,6 +90,41 @@ export const verifyStudent = async (
     select: {
       classes: true,
       student: true,
+    },
+  })
+}
+
+// TODO: unverify student
+export const unVerifyStudent = (
+  id: string,
+  studentId: string,
+  classId: string,
+  date: string
+) => {
+  return prisma.student_knowledge.update({
+    where: {
+      id,
+      AND: {
+        studentId,
+        classId,
+        date: {
+          equals: new Date(date),
+        },
+      },
+    },
+    data: {
+      adminId: null,
+      verify: false,
+      verifiedDate: null,
+    },
+  })
+}
+
+// TODO: delete student registration for a class
+export const deleteStudentRegistration = (id: string) => {
+  return prisma.student_knowledge.delete({
+    where: {
+      id,
     },
   })
 }
