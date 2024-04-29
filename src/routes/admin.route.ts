@@ -1,18 +1,22 @@
 import express from 'express'
 import {
   createAdminController,
+  deleteFromClassHandler,
   forgotPasswordHandler,
   getUpcomingClassesHandler,
+  unVerifyStudentHandler,
   verifyStudentHandler,
 } from '../controllers/admin.controller'
+import { deserializeUser } from '../middlewares/deserializeUser'
+import { checkIfAdmin } from '../middlewares/requireUser'
 import { validate } from '../middlewares/validate'
 import {
   adminSchema,
+  deleteFromClassSchema,
   forgotPasswordSchema,
+  unVerifyStudentSchema,
   verifyStudentSchema,
 } from '../schemas/admin.schema'
-import { checkIfAdmin } from '../middlewares/requireUser'
-import { deserializeUser } from '../middlewares/deserializeUser'
 
 const router = express.Router()
 
@@ -32,6 +36,22 @@ router
     checkIfAdmin,
     validate(verifyStudentSchema),
     verifyStudentHandler
+  )
+router
+  .route('/unverify-student/:id')
+  .post(
+    deserializeUser,
+    checkIfAdmin,
+    validate(unVerifyStudentSchema),
+    unVerifyStudentHandler
+  )
+router
+  .route('/registration/:id')
+  .delete(
+    deserializeUser,
+    checkIfAdmin,
+    validate(deleteFromClassSchema),
+    deleteFromClassHandler
   )
 
 export default router

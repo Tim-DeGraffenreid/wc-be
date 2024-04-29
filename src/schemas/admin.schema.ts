@@ -24,3 +24,20 @@ export const verifyStudentSchema: AnyZodObject = object({
     date: string({ required_error: 'date is required' }).datetime(),
   }),
 })
+
+export const unVerifyStudentSchema: AnyZodObject = object({
+  body: object({
+    studentId: string({ required_error: 'studentId is required' }),
+    classId: string({ required_error: 'classId is required' }),
+    date: string({ required_error: 'date is required' }).datetime(),
+  }),
+  params: object({
+    id: string({ required_error: 'id is required' }),
+  }),
+})
+
+export const deleteFromClassSchema: AnyZodObject = object({
+  params: object({
+    id: string({ required_error: 'classId is required' }),
+  }),
+})

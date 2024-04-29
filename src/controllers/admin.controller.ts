@@ -3,9 +3,11 @@ import {
   addAdmin,
   checkIfSuperAdmin,
   deleteAdmin,
+  deleteStudentRegistration,
   findAdminByDetails,
   findAdminById,
   getUpcomingClasses,
+  unVerifyStudent,
   updateAdmin,
   verifyStudent,
 } from '../services/admin.service'
@@ -122,6 +124,47 @@ export const verifyStudentHandler = async (
       status: 'success',
       message: 'Student verified successfully',
       data: updatedData,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const unVerifyStudentHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { studentId, classId, date } = req.body
+    const { id } = req.params
+
+    const updatedData = await unVerifyStudent(id, studentId, classId, date)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Student unverified successfully',
+      data: updatedData,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteFromClassHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { classId } = req.body
+    const { id } = req.params
+
+    await deleteStudentRegistration(id)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Student registration deleted successfully',
     })
   } catch (error) {
     next(error)
