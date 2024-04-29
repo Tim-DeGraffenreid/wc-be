@@ -1,5 +1,5 @@
-import { nativeEnum, object, string } from 'zod'
 import { grades, student_gender_enum } from '@prisma/client'
+import { nativeEnum, object, string } from 'zod'
 
 export const studentSchema = object({
   body: object({
@@ -67,5 +67,11 @@ export const addToClassSchema = object({
   }),
   body: object({
     date: string({ required_error: 'date is required' }).datetime(),
+  }),
+})
+
+export const removeFromClassSchema = object({
+  params: object({
+    id: string(),
   }),
 })

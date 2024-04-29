@@ -1,6 +1,6 @@
+import { educationLevel, housingStatus, veteranStatus } from '@prisma/client'
 import { AnyZodObject, array, boolean, nativeEnum, object, optional, string } from 'zod'
 import { studentSchema } from './student.schema'
-import { educationLevel, housingStatus, veteranStatus } from '@prisma/client'
 
 export const parentSchema: AnyZodObject = object({
   body: object({
@@ -77,5 +77,12 @@ export const addToClassSchema = object({
   }),
   body: object({
     date: string({ required_error: 'date is required' }).datetime(),
+  }),
+})
+
+export const removeFromClassSchema = object({
+  params: object({
+    studentId: string({ required_error: 'studentId is required' }),
+    id: string({ required_error: 'id is required' }),
   }),
 })

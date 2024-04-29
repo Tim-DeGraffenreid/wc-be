@@ -1,4 +1,8 @@
 import { NextFunction, Request, Response } from 'express'
+import { findClassById } from '../services/class.service'
+import { uploadImage } from '../services/cloudinary.service'
+import { checkClassScheduledForDay } from '../services/knowledge.service'
+import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
 import {
   addToClass,
   createStudent,
@@ -6,14 +10,11 @@ import {
   findStudentById,
   getStudentClasses,
   getStudents,
+  removeFromClass,
   updateStudent,
 } from '../services/students.service'
 import AppError from '../utils/appError'
-import { findClassById } from '../services/class.service'
-import { deleteUser, updateStudentSalesforce } from '../services/salesforce.service'
-import { uploadImage } from '../services/cloudinary.service'
 import { generateQRCode } from '../utils/qr_generator'
-import { checkClassScheduledForDay } from '../services/knowledge.service'
 
 export const getStudentsHandler = async (req: Request, res: Response) => {
   const students = await getStudents()
@@ -159,6 +160,25 @@ export const addToClassHandler = async (
       status: 'success',
       message: 'Added to class successfully',
       qrCode,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const removeFromClassHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+
+    await removeFromClass(id)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Removed from class successfully',
     })
   } catch (error) {
     next(error)

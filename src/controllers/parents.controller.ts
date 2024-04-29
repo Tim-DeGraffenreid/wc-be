@@ -12,6 +12,7 @@ import {
   getParentChild,
   getParents,
   getStudents,
+  removeChildFromClass,
   updateParent,
 } from '../services/parents.service'
 import {
@@ -262,6 +263,31 @@ export const addChildToClassHandler = async (
       status: 'success',
       message: 'Student added to class successfully',
       qrCode,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const removeChildFromClassHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { studentId, id } = req.params
+
+    const student = await getParentChild(id, studentId)
+
+    if (!student) {
+      return res.status(404).json({ error: 'Student or class not found' })
+    }
+
+    await removeChildFromClass(id, studentId)
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Student removed from class successfully',
     })
   } catch (error) {
     next(error)

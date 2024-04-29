@@ -175,3 +175,14 @@ export const updateParent = async (parent: parent, requestData: Partial<parent>)
     },
   })
 }
+
+export const removeChildFromClass = async (id: string, studentId: string) => {
+  return await prisma.student_knowledge.delete({
+    where: {
+      id,
+      AND: {
+        studentId,
+      },
+    }
+  })
+}

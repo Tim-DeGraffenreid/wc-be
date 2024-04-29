@@ -6,12 +6,14 @@ import {
   getStudentClassHandler,
   getStudentHandler,
   getStudentsHandler,
+  removeFromClassHandler,
   updateStudentHandler,
   updateStudentImageHandler,
 } from '../controllers/students.controller'
 import { validate } from '../middlewares/validate'
 import {
   addToClassSchema,
+  removeFromClassSchema,
   studentSchema,
   updateStudentSchema,
 } from '../schemas/student.schema'
@@ -34,6 +36,9 @@ router
 router
   .route('/add-to-class/:classId')
   .post(deserializeUser, requireUser, validate(addToClassSchema), addToClassHandler)
+router
+  .route('/remove-from-class/:id')
+  .delete(deserializeUser, requireUser, validate(removeFromClassSchema), removeFromClassHandler)
 router
   .route('/image')
   .post(deserializeUser, requireUser, upload.single('profile'), updateStudentImageHandler)
