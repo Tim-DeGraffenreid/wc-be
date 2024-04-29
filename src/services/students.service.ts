@@ -105,6 +105,14 @@ export const findStudentByDetails = async (data: any) => {
   }
 }
 
+export const removeFromClass = async (id: string) => {
+  return await prisma.student_knowledge.delete({
+    where: {
+      id,
+    },
+  })
+}
+
 export const deleteStudent = async (id: string) => {
   const delKnowledge = prisma.student_knowledge.deleteMany({ where: { studentId: id } })
   const delStudent = prisma.student.delete({ where: { id } })

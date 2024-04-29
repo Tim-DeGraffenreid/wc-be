@@ -45,13 +45,5 @@ router
     validate(unVerifyStudentSchema),
     unVerifyStudentHandler
   )
-router
-  .route('/registration/:id')
-  .delete(
-    deserializeUser,
-    checkIfAdmin,
-    validate(deleteFromClassSchema),
-    deleteFromClassHandler
-  )
 
 export default router

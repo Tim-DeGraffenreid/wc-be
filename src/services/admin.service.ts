@@ -94,7 +94,6 @@ export const verifyStudent = async (
   })
 }
 
-// TODO: unverify student
 export const unVerifyStudent = (
   id: string,
   studentId: string,
@@ -120,7 +119,6 @@ export const unVerifyStudent = (
   })
 }
 
-// TODO: delete student registration for a class
 export const deleteStudentRegistration = (id: string) => {
   return prisma.student_knowledge.delete({
     where: {
