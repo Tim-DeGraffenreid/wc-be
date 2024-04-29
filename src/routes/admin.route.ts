@@ -46,7 +46,7 @@ router
     unVerifyStudentHandler
   )
 router
-  .route('/:id')
+  .route('/registration/:id')
   .delete(
     deserializeUser,
     checkIfAdmin,
