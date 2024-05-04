@@ -275,7 +275,8 @@ export const removeChildFromClassHandler = async (
   next: NextFunction
 ) => {
   try {
-    const { studentId, id } = req.params
+    const { studentId } = req.params
+    const { id } = res.locals.user
 
     const student = await getParentChild(id, studentId)
 
