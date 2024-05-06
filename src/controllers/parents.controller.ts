@@ -279,9 +279,8 @@ export const removeChildFromClassHandler = async (
     const { id: parentId } = res.locals.user
 
     const student = await getParentChild(parentId, studentId)
-    const isClass = await findClassById(id)
 
-    if (!student || !isClass) {
+    if (!student) {
       return res.status(404).json({ error: 'Student or class not found' })
     }
 
