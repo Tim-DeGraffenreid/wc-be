@@ -9,6 +9,29 @@ export const createEvent = async (data: Prisma.eventsCreateInput) => {
   }
 }
 
+export const checkIfEventWithClassExistForDateAlready = async (
+  classId: string,
+  date: Date,
+  start_time: string,
+  end_time: string
+) => {
+  const existingEvent = await prisma.events.findFirst({
+    where: {
+      classId,
+      event_date: {
+        equals: new Date(date),
+      },
+      start_time: {
+        equals: new Date(start_time),
+      },
+      end_time: {
+        equals: new Date(end_time),
+      },
+    },
+  })
+  return !!existingEvent
+}
+
 export const getEvents = async () => {
   try {
     return await prisma.events.findMany({

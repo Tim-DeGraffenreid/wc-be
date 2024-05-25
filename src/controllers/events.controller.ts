@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { findClassById } from '../services/class.service'
 import {
-  checkEventsScheduledForDay,
+  checkIfEventWithClassExistForDateAlready,
   createEvent,
   deleteEvent,
   getEvents,
@@ -14,11 +14,18 @@ export const createEventhandler = async (
   next: NextFunction
 ) => {
   try {
-    const { start_time, event_date } = req.body
+    const { start_time, event_date, end_time } = req.body
     const { classId } = req.params
     await findClassById(classId)
 
-    const checkEvent = await checkEventsScheduledForDay(start_time, event_date)
+    const checkEvent = await checkIfEventWithClassExistForDateAlready(
+      classId,
+      event_date,
+      start_time,
+      end_time
+    )
+
+    console.log(checkEvent)
 
     if (checkEvent) {
       res.status(400).json({ error: 'Event already scheduled for that date and time' })
