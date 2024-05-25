@@ -25,7 +25,7 @@ export const createEventhandler = async (
       end_time
     )
 
-    console.log(checkEvent)
+    console.log({ checkEvent })
 
     if (checkEvent) {
       res.status(400).json({ error: 'Event already scheduled for that date and time' })
