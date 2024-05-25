@@ -28,7 +28,9 @@ export const createEventhandler = async (
     console.log({ checkEvent })
 
     if (checkEvent) {
-      res.status(400).json({ error: 'Event already scheduled for that date and time' })
+      return res
+        .status(400)
+        .json({ error: 'Event already scheduled for that date and time' })
     }
 
     const event = await createEvent({ ...req.body, class: { connect: { id: classId } } })
