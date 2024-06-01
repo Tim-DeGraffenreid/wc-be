@@ -106,8 +106,8 @@ model events {
   id                    String              @id(map: "PK_3d8017e1cb58429474a3c0419ghgh4") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   created_at            DateTime            @default(now()) @db.Timestamp(6)
   updated_at            DateTime            @default(now()) @db.Timestamp(6)
-  class                 classes             @relation(fields: [classId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  classId               String              @db.Uuid
+  class                 classes?             @relation(fields: [classId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+  classId               String?              @db.Uuid
   start_time            DateTime
   end_time              DateTime
   event_date            DateTime
