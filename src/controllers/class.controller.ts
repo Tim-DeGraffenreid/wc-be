@@ -15,6 +15,9 @@ export const getClassesHandler = async (
 ) => {
   try {
     const classes = await getClasses()
+
+    
+
     res.status(200).json({
       status: 'success',
       classes,
@@ -92,6 +95,7 @@ export const deleteClassHandler = async (
   try {
     const { id } = req.params
     const clss = await findClassById(id)
+    console.log(id)
     if (!clss) {
       return next(new AppError(404, 'Class with id does not exist'))
     }
