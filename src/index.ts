@@ -1,3 +1,4 @@
+
 import 'dotenv/config'
 import express, {
   Express,
@@ -25,11 +26,11 @@ import {
   syncDatabaseAndSalesforce,
 } from './services/salesforce.service'
 
+const app: Express = express()
+const port = process.env.PORT || 3000
+
 connectRedis()
   .then(async () => {
-    const app: Express = express()
-    const port = process.env.PORT || 5000
-
     app.use(cors())
     app.use(json())
     app.use(urlencoded({ extended: false }))
@@ -44,29 +45,7 @@ connectRedis()
     app.use('/api/events', eventsRouter)
 
     // CronJobs
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await syncDatabaseAndSalesforce()
-      } catch (error) {
-        console.error('Error during scheduled synchronization:', error)
-      }
-    })
 
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await handleParentToChildren()
-      } catch (error) {
-        console.error('Error during scheduled relationship update:', error)
-      }
-    })
-
-    cron.schedule('*/2 * * * *', async () => {
-      try {
-        await deleteFromDatabase()
-      } catch (error) {
-        console.error('Error during schedule database deletion:', error)
-      }
-    })
 
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
@@ -99,3 +78,7 @@ connectRedis()
     })
   })
   .catch((err: any) => console.log(err))
+
+  module.exports = app;
+
+

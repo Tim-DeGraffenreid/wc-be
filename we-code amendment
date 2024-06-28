@@ -47,3 +47,12 @@ This is part of the label
 What happens if a student forgets to sign in or out?
 
 When validating the qr code, perhaps allow the date field to be modified before it is confirmed.
+
+    
+  "scripts": {
+    "start": "node api/index.js",
+    "build": "npx tsc",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q api/index.js\""
+  },
+
+  
