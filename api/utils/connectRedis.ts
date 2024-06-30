@@ -1,10 +1,19 @@
 import { createClient, RedisClientType } from 'redis';
-
+/*/
 const redisClient: RedisClientType = createClient({
   password: 'VrMDd6Xwxu4kpNQDwYudS9TeofGdfI8D',
   socket: {
     host: 'redis-14837.c302.asia-northeast1-1.gce.cloud.redislabs.com',
     port: 14837,
+  },
+});
+*/ 
+
+const redisClient: RedisClientType = createClient({
+  password: 'pFi638ApU6pFWRfvyJvxMj1hRG9cvJln',
+  socket: {
+      host: 'redis-19345.c246.us-east-1-4.ec2.redns.redis-cloud.com',
+      port: 19345
   },
 });
 
