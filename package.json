@@ -42,8 +42,8 @@
     "zod": "^3.22.4"
   },
   "scripts": {
-    "start": "echo \"Error: no test specified\" && exit 1"
-  
+    "start": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "prisma generate"
   },
   "engines": {
     "node": ">=18"
