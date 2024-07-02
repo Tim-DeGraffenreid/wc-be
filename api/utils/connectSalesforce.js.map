@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 {"version":3,"file":"connectSalesforce.js","sourceRoot":"","sources":["../../src/utils/connectSalesforce.ts"],"names":[],"mappings":""}
+=======
+{"version":3,"file":"connectSalesforce.js","sourceRoot":"","sources":["connectSalesforce.ts"],"names":[],"mappings":""}
+>>>>>>> origin/master

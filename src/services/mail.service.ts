@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer'
 import AppError from '../utils/appError'
 
 let transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
+  host: process.env.EMAIL_HOST ,
   secure: false,
   port: process.env.EMAIL_PORT,
   logger: true,
@@ -104,7 +104,15 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       throw new AppError(500, err.message)
     })
 }
+<<<<<<< HEAD:src/services/mail.service.ts
 */
 export const sendConfirmationEmail = async (email: string, token: string) => {
   console.log("No email!");
 }
+=======
+    */
+
+export const sendConfirmationEmail = async (email: string, token: string) =>{
+  console.log("Nothing");
+}
+>>>>>>> origin/master:api/services/mail.service.ts

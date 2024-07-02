@@ -76,10 +76,18 @@ connectRedis()
     app.listen(port, () => {
       console.log(`⚡[server]: Server started successfully on PORT: ${port}`)
     })
+<<<<<<< HEAD:src/index.ts
 */
   })
   .catch((err: any) => console.log(err))
 
 export default app;
+=======
+      */
+  })
+  .catch((err: any) => console.log(err))
+
+ export default app;
+>>>>>>> origin/master:api/index.ts
 
 
