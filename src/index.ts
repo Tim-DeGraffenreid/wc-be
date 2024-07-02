@@ -76,10 +76,10 @@ connectRedis()
     app.listen(port, () => {
       console.log(`⚡[server]: Server started successfully on PORT: ${port}`)
     })
-      */
+*/
   })
   .catch((err: any) => console.log(err))
 
- export default app;
+export default app;
 
 

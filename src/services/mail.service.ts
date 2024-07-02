@@ -104,8 +104,7 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       throw new AppError(500, err.message)
     })
 }
-    */
-
-export const sendConfirmationEmail = async (email: string, token: string) =>{
-  console.log("Nothing");
+*/
+export const sendConfirmationEmail = async (email: string, token: string) => {
+  console.log("No email!");
 }
