@@ -3,7 +3,7 @@
     "target": "es2016",
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "./api",
+    "outDir": "api",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "sourceMap": true,
@@ -13,5 +13,7 @@
     "strictPropertyInitialization": false,
     "skipLibCheck": true,
     "typeRoots": ["./node_modules/@types", "./env.d.ts"]
-  }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

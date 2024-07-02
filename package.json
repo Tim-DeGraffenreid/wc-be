@@ -43,6 +43,7 @@
   },
   "scripts": {
     "start": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
     "postinstall": "prisma generate"
   },
   "engines": {
