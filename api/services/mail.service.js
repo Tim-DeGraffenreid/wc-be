@@ -1,5 +1,4 @@
 "use strict";
-<<<<<<< HEAD
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -11,18 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendConfirmationEmail = void 0;
-=======
->>>>>>> origin/master
 /*
 import nodemailer from 'nodemailer'
 import AppError from '../utils/appError'
 
 let transporter = nodemailer.createTransport({
-<<<<<<< HEAD
-  host: process.env.EMAIL_HOST,
-=======
   host: process.env.EMAIL_HOST ,
->>>>>>> origin/master
   secure: false,
   port: process.env.EMAIL_PORT,
   logger: true,
@@ -123,26 +116,9 @@ export const sendConfirmationEmail = async (email: string, token: string) => {
       throw new AppError(500, err.message)
     })
 }
-<<<<<<< HEAD
 */
 const sendConfirmationEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("No email!");
-=======
-    */
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendConfirmationEmail = void 0;
-const sendConfirmationEmail = (email, token) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("Nothing");
->>>>>>> origin/master
 });
 exports.sendConfirmationEmail = sendConfirmationEmail;
 //# sourceMappingURL=mail.service.js.map
