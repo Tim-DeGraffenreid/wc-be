@@ -39,6 +39,7 @@ require("dotenv/config");
 const express_1 = __importStar(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const node_cron_1 = __importDefault(require("node-cron"));
 const parents_route_1 = __importDefault(require("./routes/parents.route"));
 const students_route_1 = __importDefault(require("./routes/students.route"));
 const auth_route_1 = __importDefault(require("./routes/auth.route"));
@@ -47,6 +48,7 @@ const class_route_1 = __importDefault(require("./routes/class.route"));
 const events_route_1 = __importDefault(require("./routes/events.route"));
 const appError_1 = __importDefault(require("./utils/appError"));
 const connectRedis_1 = __importStar(require("./utils/connectRedis"));
+const salesforce_service_1 = require("./services/salesforce.service");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 (0, connectRedis_1.connectRedis)()
@@ -63,6 +65,31 @@ const port = process.env.PORT || 3000;
     app.use('/api/admin', admin_route_1.default);
     app.use('/api/events', events_route_1.default);
     // CronJobs
+    // CronJobs
+    node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield (0, salesforce_service_1.syncDatabaseAndSalesforce)();
+        }
+        catch (error) {
+            console.error('Error during scheduled synchronization:', error);
+        }
+    }));
+    node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield (0, salesforce_service_1.handleParentToChildren)();
+        }
+        catch (error) {
+            console.error('Error during scheduled relationship update:', error);
+        }
+    }));
+    node_cron_1.default.schedule('*/2 * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            yield (0, salesforce_service_1.deleteFromDatabase)();
+        }
+        catch (error) {
+            console.error('Error during schedule database deletion:', error);
+        }
+    }));
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const message = yield connectRedis_1.default.get('try');
