@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const client_1 = require("@prisma/client");
+const edge_1 = require("@prisma/client/edge");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const prisma = new client_1.PrismaClient();
+const prisma = new edge_1.PrismaClient();
 const createSuperAdmin = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const superAdmin = yield prisma.admin.findUnique({
