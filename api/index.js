@@ -49,6 +49,7 @@ const events_route_1 = __importDefault(require("./routes/events.route"));
 const appError_1 = __importDefault(require("./utils/appError"));
 const connectRedis_1 = __importStar(require("./utils/connectRedis"));
 const salesforce_service_1 = require("./services/salesforce.service");
+const crons_route_1 = __importDefault(require("./routes/crons.route"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 (0, connectRedis_1.connectRedis)()
@@ -64,6 +65,7 @@ const port = process.env.PORT || 3000;
     app.use('/api/students', students_route_1.default);
     app.use('/api/admin', admin_route_1.default);
     app.use('/api/events', events_route_1.default);
+    app.use('/api/crons', crons_route_1.default);
     // CronJobs
     // CronJobs
     node_cron_1.default.schedule('*/1 * * * *', () => __awaiter(void 0, void 0, void 0, function* () {
