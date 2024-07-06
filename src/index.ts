@@ -25,7 +25,7 @@ import {
   handleParentToChildren,
   syncDatabaseAndSalesforce,
 } from './services/salesforce.service'
-
+import cronsRouter from './routes/crons.route'
 const app: Express = express()
 const port = process.env.PORT || 3000
 
@@ -43,7 +43,7 @@ connectRedis()
     app.use('/api/students', studentRouter)
     app.use('/api/admin', adminRouter)
     app.use('/api/events', eventsRouter)
-
+    app.use('/api/crons', cronsRouter )
     // CronJobs
     // CronJobs
     cron.schedule('*/1 * * * *', async () => {
