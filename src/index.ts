@@ -45,31 +45,8 @@ connectRedis()
     app.use('/api/events', eventsRouter)
     app.use('/api/crons', cronsRouter )
     // CronJobs
-    // CronJobs
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await syncDatabaseAndSalesforce()
-      } catch (error) {
-        console.error('Error during scheduled synchronization:', error)
-      }
-    })
-
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await handleParentToChildren()
-      } catch (error) {
-        console.error('Error during scheduled relationship update:', error)
-      }
-    })
-
-    cron.schedule('*/2 * * * *', async () => {
-      try {
-        await deleteFromDatabase()
-      } catch (error) {
-        console.error('Error during schedule database deletion:', error)
-      }
-    })
-
+  
+ 
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')
@@ -95,11 +72,11 @@ connectRedis()
         message: error.message,
       })
     })
-/*
+
     app.listen(port, () => {
       console.log(`⚡[server]: Server started successfully on PORT: ${port}`)
     })
-*/
+
   })
   .catch((err: any) => console.log(err))
 

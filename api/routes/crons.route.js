@@ -14,13 +14,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const router = express_1.default.Router();
-router.route('/sync').get(() => __awaiter(void 0, void 0, void 0, function* () {
+router.route('/sync').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log("Ran sync no error.");
         //await syncDatabaseAndSalesforce()
+        console.log("Ran sync no error.");
+        res.status(201).json({
+            status: 'success',
+            data: {
+                sync: 'Ran sync success',
+            },
+        });
     }
     catch (error) {
         console.error('Error during scheduled synchronization:', error);
+        next(error);
     }
 }));
 exports.default = router;
