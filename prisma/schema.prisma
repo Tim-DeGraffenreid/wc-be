@@ -4,10 +4,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = "postgres://uuypteaa:lAHwmWya1gt8E414Uxf8vIHSXkZ-hveB@floppy.db.elephantsql.com/uuypteaa"
-
- // url = env("POSTGRES_PRISMA_URL") // uses connection pooling
- // directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
 model classes {
