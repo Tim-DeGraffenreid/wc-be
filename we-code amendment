@@ -55,4 +55,28 @@ When validating the qr code, perhaps allow the date field to be modified before 
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q api/index.js\""
   },
 
-  
+     
+    cron.schedule('*/1 * * * *', async () => {
+      try {
+        await syncDatabaseAndSalesforce()
+      } catch (error) {
+        console.error('Error during scheduled synchronization:', error)
+      }
+    })
+
+    cron.schedule('*/1 * * * *', async () => {
+      try {
+        await handleParentToChildren()
+      } catch (error) {
+        console.error('Error during scheduled relationship update:', error)
+      }
+    })
+
+    cron.schedule('*/2 * * * *', async () => {
+      try {
+        await deleteFromDatabase()
+      } catch (error) {
+        console.error('Error during schedule database deletion:', error)
+      }
+    })
+
