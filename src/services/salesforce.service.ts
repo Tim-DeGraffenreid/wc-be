@@ -229,7 +229,7 @@ export const deleteFromDatabase = async () => {
 export const syncDatabaseAndSalesforce = async () => {
   try {
     const salesforceData = await getDataFromSalesforce()
-
+    console.log("Syncing data...");
     const salesforcePromise = salesforceData?.records?.map(async (record: any) => {
       const { Parent_or_Student__c, ...data } = record
       const convertedData = {
@@ -248,6 +248,10 @@ export const syncDatabaseAndSalesforce = async () => {
         zipCode: data?.MailingPostalCode,
       }
       let savedData
+
+      console.log("record?.id:", record?.id);
+      console.log("record.id:", record.id);
+      console.log("Converted data: ", convertedData);
       if (Parent_or_Student__c === 'parent') {
         savedData = await prisma.parent.update({
           where: { id: record.id, salesforceId: record?.id },
