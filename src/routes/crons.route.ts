@@ -11,8 +11,8 @@ router.route('/synchronize').get( async (  req: Request,
     res: Response,
     next: NextFunction) => {  
   try {
-    await syncDatabaseAndSalesforce()
-
+   // await syncDatabaseAndSalesforce()
+    console.log("Syncronize")
     res.status(201).json({
         status: 'success',
         message:  'syncDatabaseAndSalesforce successfully executed',

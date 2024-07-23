@@ -17,7 +17,8 @@ const salesforce_service_1 = require("../services/salesforce.service");
 const router = express_1.default.Router();
 router.route('/synchronize').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield (0, salesforce_service_1.syncDatabaseAndSalesforce)();
+        // await syncDatabaseAndSalesforce()
+        console.log("Syncronize");
         res.status(201).json({
             status: 'success',
             message: 'syncDatabaseAndSalesforce successfully executed',
