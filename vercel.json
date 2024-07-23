@@ -5,5 +5,19 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" }
+  ],
+  "crons": [
+    {
+      "path": "/api/crons/syncronize",
+      "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/crons/relationships",
+      "schedule": "*/1 * * * *"
+    },
+    {
+      "path": "/api/crons/delete-orphans",
+      "schedule": "*/2 * * * *"
+    }
   ]
 }
