@@ -9,15 +9,15 @@
   "crons": [
     {
       "path": "/api/crons/syncronize",
-      "schedule": "*/1 * * * *"
+      "schedule": "30 2 * * *"
     },
     {
       "path": "/api/crons/relationships",
-      "schedule": "*/1 * * * *"
+      "schedule": "30 2 * * *"
     },
     {
       "path": "/api/crons/delete-orphans",
-      "schedule": "*/2 * * * *"
+      "schedule": "30 2 * * *"
     }
   ]
 }
