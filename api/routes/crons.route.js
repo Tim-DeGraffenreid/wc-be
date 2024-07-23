@@ -13,20 +13,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const salesforce_service_1 = require("../services/salesforce.service");
 const router = express_1.default.Router();
-router.route('/sync').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+router.route('/synchronize').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //await syncDatabaseAndSalesforce()
-        console.log("Ran sync no error.");
+        yield (0, salesforce_service_1.syncDatabaseAndSalesforce)();
         res.status(201).json({
             status: 'success',
-            data: {
-                sync: 'Ran sync success',
-            },
+            message: 'syncDatabaseAndSalesforce successfully executed',
         });
     }
     catch (error) {
-        console.error('Error during scheduled synchronization:', error);
+        console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error);
+        next(error);
+    }
+}));
+router.route("/relationships").get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, salesforce_service_1.handleParentToChildren)();
+        res.status(201).json({
+            "status": "success",
+            "message": "handleParentToChildren successfully executed",
+        });
+    }
+    catch (error) {
+        console.error("handleParentToChildren error during scheduled synchronization:", error);
+        next(error);
+    }
+}));
+router.route("/delete-orphans").get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield (0, salesforce_service_1.deleteFromDatabase)();
+        res.status(201).json({
+            "status": "success",
+            "message": "deleteFromDatabase successfully executed",
+        });
+    }
+    catch (error) {
+        console.error("deleteFromDatabase error during scheduled synchronizatoin:", error);
         next(error);
     }
 }));

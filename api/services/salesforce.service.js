@@ -233,6 +233,7 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
     var _e;
     try {
         const salesforceData = yield getDataFromSalesforce();
+        console.log("Syncing data...");
         const salesforcePromise = (_e = salesforceData === null || salesforceData === void 0 ? void 0 : salesforceData.records) === null || _e === void 0 ? void 0 : _e.map((record) => __awaiter(void 0, void 0, void 0, function* () {
             const { Parent_or_Student__c } = record, data = __rest(record, ["Parent_or_Student__c"]);
             const convertedData = {
@@ -251,6 +252,9 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
                 zipCode: data === null || data === void 0 ? void 0 : data.MailingPostalCode,
             };
             let savedData;
+            console.log("record?.id:", record === null || record === void 0 ? void 0 : record.id);
+            console.log("record.id:", record.id);
+            console.log("Converted data: ", convertedData);
             if (Parent_or_Student__c === 'parent') {
                 savedData = yield prisma_1.default.parent.update({
                     where: { id: record.id, salesforceId: record === null || record === void 0 ? void 0 : record.id },
