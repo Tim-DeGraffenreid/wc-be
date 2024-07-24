@@ -50,7 +50,7 @@ connectRedis()
       res: Response,
       next: NextFunction) => {  
     try {
-     // await syncDatabaseAndSalesforce()
+      await syncDatabaseAndSalesforce()
       console.log("Syncronize")
       res.status(201).json({
           status: 'success',
