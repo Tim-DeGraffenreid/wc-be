@@ -252,20 +252,23 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
                 zipCode: data === null || data === void 0 ? void 0 : data.MailingPostalCode,
             };
             let savedData;
-            console.log("record.Id:", record === null || record === void 0 ? void 0 : record.Id);
-            console.log("record:", record);
-            console.log("Converted data: ", convertedData);
             if (Parent_or_Student__c === 'parent') {
                 savedData = yield prisma_1.default.parent.update({
-                    where: { id: record.id, salesforceId: record === null || record === void 0 ? void 0 : record.id },
+                    where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
                     data: Object.assign({}, convertedData),
                 });
+                if (savedData) {
+                    console.log("match: ", savedData);
+                }
             }
             else if ((record === null || record === void 0 ? void 0 : record.Parent_or_Student__) === 'student') {
                 savedData = yield prisma_1.default.student.update({
-                    where: { id: record.id, salesforceId: record === null || record === void 0 ? void 0 : record.id },
+                    where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
                     data: Object.assign({}, convertedData),
                 });
+                if (savedData) {
+                    console.log("match: ", savedData);
+                }
             }
         }));
         yield Promise.all(salesforcePromise);
