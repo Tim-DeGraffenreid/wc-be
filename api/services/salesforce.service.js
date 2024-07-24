@@ -253,14 +253,13 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
             };
             try {
                 let savedData;
-                console.log("Parent_or_Student__c", Parent_or_Student__c);
-                if (Parent_or_Student__c === 'parent') {
+                if (Parent_or_Student__c === 'Parent') {
                     savedData = yield prisma_1.default.parent.update({
                         where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
                         data: Object.assign({}, convertedData),
                     });
                 }
-                else if (Parent_or_Student__c === 'student') {
+                else if (Parent_or_Student__c === 'Student') {
                     savedData = yield prisma_1.default.student.update({
                         where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
                         data: Object.assign({}, convertedData),
