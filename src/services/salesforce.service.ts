@@ -250,13 +250,13 @@ export const syncDatabaseAndSalesforce = async () => {
 
       try {
         let savedData
-        console.log("Parent_or_Student__c", Parent_or_Student__c)
-        if (Parent_or_Student__c === 'parent') {
+       
+        if (Parent_or_Student__c === 'Parent') {
           savedData = await prisma.parent.update({
             where: { salesforceId: record?.Id },
             data: { ...convertedData },
           });
-        } else if (Parent_or_Student__c === 'student') {
+        } else if (Parent_or_Student__c === 'Student') {
           savedData = await prisma.student.update({
             where: { salesforceId: record?.Id },
             data: { ...convertedData },
