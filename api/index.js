@@ -65,6 +65,20 @@ const port = process.env.PORT || 3000;
     app.use('/api/events', events_route_1.default);
     app.use('/api/crons', crons_route_1.default);
     // CronJobs
+    app.get('/synchronize', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            // await syncDatabaseAndSalesforce()
+            console.log("Syncronize");
+            res.status(201).json({
+                status: 'success',
+                message: 'syncDatabaseAndSalesforce successfully executed',
+            });
+        }
+        catch (error) {
+            console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error);
+            next(error);
+        }
+    }));
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const message = yield connectRedis_1.default.get('try');
