@@ -249,8 +249,8 @@ export const syncDatabaseAndSalesforce = async () => {
       }
       let savedData
 
-      console.log("record?.id:", record?.id);
-      console.log("record.id:", record.id);
+      console.log("record.Id:", record?.Id);
+      console.log("record:", record);
       console.log("Converted data: ", convertedData);
       if (Parent_or_Student__c === 'parent') {
         savedData = await prisma.parent.update({

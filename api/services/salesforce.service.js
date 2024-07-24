@@ -252,8 +252,8 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
                 zipCode: data === null || data === void 0 ? void 0 : data.MailingPostalCode,
             };
             let savedData;
-            console.log("record?.id:", record === null || record === void 0 ? void 0 : record.id);
-            console.log("record.id:", record.id);
+            console.log("record.Id:", record === null || record === void 0 ? void 0 : record.Id);
+            console.log("record:", record);
             console.log("Converted data: ", convertedData);
             if (Parent_or_Student__c === 'parent') {
                 savedData = yield prisma_1.default.parent.update({
