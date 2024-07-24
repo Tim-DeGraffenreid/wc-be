@@ -251,23 +251,31 @@ const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, functi
                 gender: data === null || data === void 0 ? void 0 : data.Gender__c,
                 zipCode: data === null || data === void 0 ? void 0 : data.MailingPostalCode,
             };
-            let savedData;
-            if (Parent_or_Student__c === 'parent') {
-                savedData = yield prisma_1.default.parent.update({
-                    where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
-                    data: Object.assign({}, convertedData),
-                });
+            try {
+                let savedData;
+                console.log("Parent_or_Student__c", Parent_or_Student__c);
+                if (Parent_or_Student__c === 'parent') {
+                    savedData = yield prisma_1.default.parent.update({
+                        where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
+                        data: Object.assign({}, convertedData),
+                    });
+                }
+                else if (Parent_or_Student__c === 'student') {
+                    savedData = yield prisma_1.default.student.update({
+                        where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
+                        data: Object.assign({}, convertedData),
+                    });
+                }
                 if (savedData) {
-                    console.log("match: ", savedData);
+                    console.log("Record updated:", savedData);
                 }
             }
-            else if ((record === null || record === void 0 ? void 0 : record.Parent_or_Student__) === 'student') {
-                savedData = yield prisma_1.default.student.update({
-                    where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
-                    data: Object.assign({}, convertedData),
-                });
-                if (savedData) {
-                    console.log("match: ", savedData);
+            catch (error) {
+                if (error.code === 'P2025') {
+                    console.log(`No record found for salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`);
+                }
+                else {
+                    console.error(`Error updating record with salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`, error);
                 }
             }
         }));

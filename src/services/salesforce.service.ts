@@ -247,24 +247,30 @@ export const syncDatabaseAndSalesforce = async () => {
         gender: data?.Gender__c,
         zipCode: data?.MailingPostalCode,
       }
-      let savedData
 
-  
-      if (Parent_or_Student__c === 'parent') {
-        savedData = await prisma.parent.update({
-          where: { salesforceId: record?.Id },
-          data: { ...convertedData },
-        })
-        if(savedData){
-          console.log("match: ", savedData);
+      try {
+        let savedData
+        console.log("Parent_or_Student__c", Parent_or_Student__c)
+        if (Parent_or_Student__c === 'parent') {
+          savedData = await prisma.parent.update({
+            where: { salesforceId: record?.Id },
+            data: { ...convertedData },
+          });
+        } else if (Parent_or_Student__c === 'student') {
+          savedData = await prisma.student.update({
+            where: { salesforceId: record?.Id },
+            data: { ...convertedData },
+          });
         }
-      } else if (record?.Parent_or_Student__ === 'student') {
-        savedData = await prisma.student.update({
-          where: { salesforceId: record?.Id },
-          data: { ...convertedData },
-        })
-        if(savedData){
-          console.log("match: ", savedData);
+
+        if (savedData) {
+          console.log("Record updated:", savedData);
+        }
+      } catch (error) {
+        if (error.code === 'P2025') {
+          console.log(`No record found for salesforceId: ${record?.Id}`);
+        } else {
+          console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
         }
       }
     })
