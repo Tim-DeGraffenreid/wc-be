@@ -47,6 +47,7 @@ const class_route_1 = __importDefault(require("./routes/class.route"));
 const events_route_1 = __importDefault(require("./routes/events.route"));
 const appError_1 = __importDefault(require("./utils/appError"));
 const connectRedis_1 = __importStar(require("./utils/connectRedis"));
+const salesforce_service_1 = require("./services/salesforce.service");
 const crons_route_1 = __importDefault(require("./routes/crons.route"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
@@ -67,7 +68,7 @@ const port = process.env.PORT || 3000;
     // CronJobs
     app.get('/api/synchronize', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            // await syncDatabaseAndSalesforce()
+            yield (0, salesforce_service_1.syncDatabaseAndSalesforce)();
             console.log("Syncronize");
             res.status(201).json({
                 status: 'success',
