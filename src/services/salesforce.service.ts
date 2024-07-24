@@ -249,19 +249,23 @@ export const syncDatabaseAndSalesforce = async () => {
       }
       let savedData
 
-      console.log("record.Id:", record?.Id);
-      console.log("record:", record);
-      console.log("Converted data: ", convertedData);
+  
       if (Parent_or_Student__c === 'parent') {
         savedData = await prisma.parent.update({
-          where: { id: record.id, salesforceId: record?.id },
+          where: { salesforceId: record?.Id },
           data: { ...convertedData },
         })
+        if(savedData){
+          console.log("match: ", savedData);
+        }
       } else if (record?.Parent_or_Student__ === 'student') {
         savedData = await prisma.student.update({
-          where: { id: record.id, salesforceId: record?.id },
+          where: { salesforceId: record?.Id },
           data: { ...convertedData },
         })
+        if(savedData){
+          console.log("match: ", savedData);
+        }
       }
     })
 
