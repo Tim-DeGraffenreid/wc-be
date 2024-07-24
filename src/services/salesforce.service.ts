@@ -248,6 +248,25 @@ export const syncDatabaseAndSalesforce = async () => {
         zipCode: data?.MailingPostalCode,
       }
 
+      if(record?.id === "003WD000006diLwYAI"){
+        console.log("003WD000006diLwYAI mathced.")
+        try{
+         const savedData = await prisma.parent.update({
+            where: { salesforceId: record?.Id },
+            data: { ...convertedData },
+          });
+          console.log(savedData);
+
+        }catch(error){
+          if (error.code === 'P2025') {
+            console.log(`No record found for salesforceId: ${record?.Id}`);
+          } else {
+            console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
+          }
+        }
+      }
+
+      /*
       try {
         let savedData
        
@@ -273,6 +292,7 @@ export const syncDatabaseAndSalesforce = async () => {
           console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
         }
       }
+      */
     })
 
     await Promise.all(salesforcePromise)
