@@ -46,7 +46,7 @@ connectRedis()
     app.use('/api/crons', cronsRouter )
     // CronJobs
   
-    app.get('/synchronize', async (  req: Request,
+    app.get('/api/synchronize', async (  req: Request,
       res: Response,
       next: NextFunction) => {  
     try {
@@ -61,6 +61,16 @@ connectRedis()
       console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error)
       next(error)
     }})
+
+    app.get('/api/sync', async (_req: Request, res: Response) => {
+      const message = "sync visited"
+      console.log("message: ", message)
+
+      res.status(200).json({
+        status: 'success',
+        message,
+      })
+    })
     
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
