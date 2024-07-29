@@ -94,12 +94,26 @@ const addStudentsHandler = (req, res, next) => __awaiter(void 0, void 0, void 0,
         // console.log(checkIfExist)
         // if (!checkIfExist!) {
         const student = yield (0, parents_service_1.createNewStudent)(Object.assign({}, req.body), id);
-        const salesforce = yield (0, salesforce_service_1.addStudentToSalesforce)(req.body);
-        if (typeof salesforce === 'object' && salesforce.id) {
-            yield (0, students_service_1.updateStudent)(student, { salesforceId: salesforce.id });
+        const salesforce = yield (0, salesforce_service_1.addStudentWithRelationshipToSF)(req.body, id);
+        //Add rollback if error adding to salesforce & send error code indicating such w/ message
+        if (typeof salesforce === 'object' && salesforce.compositeResponse[0].body.id) {
+            yield (0, students_service_1.updateStudent)(student, { salesforceId: salesforce.compositeResponse[0].body.id });
+            student.salesforceId = salesforce.compositeResponse[0].body.id;
             res.status(201).json({
                 status: 'success',
                 data: student,
+            });
+        }
+        else {
+            const errorCodes = salesforce.compositeResponse
+                .map((item) => item.body)
+                .flat()
+                .filter((bodyItem) => bodyItem.errorCode && bodyItem.errorCode !== "PROCESSING_HALTED")
+                .map((filteredItem) => filteredItem.errorCode);
+            yield (0, students_service_1.deleteStudent)(student.id);
+            res.status(409).json({
+                status: 'error',
+                message: errorCodes.toString() || "An error occurred adding student to Salesforce.",
             });
         }
         // } else {

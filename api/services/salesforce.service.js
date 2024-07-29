@@ -24,9 +24,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkSalesforceForDuplicates = exports.getStudentId = exports.handleParentToChildren = exports.syncDatabaseAndSalesforce = exports.deleteFromDatabase = exports.deleteUser = exports.updateParentSalesforce = exports.updateStudentSalesforce = exports.addParentToSalesforce = exports.addStudentToSalesforce = void 0;
+exports.checkSalesforceForDuplicates = exports.getStudentId = exports.handleParentToChildren = exports.syncDatabaseAndSalesforce = exports.deleteFromDatabase = exports.deleteUser = exports.updateParentSalesforce = exports.updateStudentSalesforce = exports.addParentToSalesforce = exports.addStudentToSalesforce = exports.addStudentWithRelationshipToSF = exports.getSalesforceId = void 0;
 const axios_1 = __importDefault(require("axios"));
 const prisma_1 = __importDefault(require("../utils/prisma"));
+const mappings_1 = require("../utils/mappings");
+const mappingFilters_1 = require("../utils/mappingFilters");
+const mappingFilters_2 = require("../utils/mappingFilters");
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token'; // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
 const clientId = process.env.SFCLIENTID; //  Salesforce client ID
 const clientSecret = process.env.SFCLIENTSECRET; // Salesforce client secret
@@ -59,8 +62,70 @@ apiClient.interceptors.request.use((config) => __awaiter(void 0, void 0, void 0,
     config.headers['X-Authorization-Date'] = new Date().toUTCString();
     return config;
 }));
+const getSalesforceId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const parent = yield prisma_1.default.parent.findUnique({
+            where: {
+                id: id,
+            },
+        });
+        return parent === null || parent === void 0 ? void 0 : parent.salesforceId;
+    }
+    catch (error) {
+        console.log('salesforce.service.ts -> getSalesforceId:', error);
+        throw error;
+    }
+});
+exports.getSalesforceId = getSalesforceId;
+const addStudentWithRelationshipToSF = (student, id) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const parentId = yield (0, exports.getSalesforceId)(id);
+    console.log("parentId" + id + ": ", parentId);
+    const composite = {
+        allOrNone: true,
+        compositeRequest: [{
+                method: "POST",
+                url: "/services/data/v58.0/sobjects/Contact",
+                referenceId: "refContact",
+                body: {
+                    Parent_or_Student__c: 'Student',
+                    Email: student.email,
+                    LastName: student.lName,
+                    FirstName: student.fName,
+                    Phone: student.phoneNumber,
+                    Birthdate: student.birthday,
+                    Grade__c: GradeLevel[student.grade],
+                    School__c: student.schoolName,
+                    Gender__c: Gender[student.gender],
+                    MailingPostalCode: student.zipCode,
+                    Emergency_Contact__c: student.emergencyContact,
+                }
+            }, {
+                method: "POST",
+                url: "/services/data/v58.0/sobjects/npe4__Relationship__c",
+                referenceId: "refRelationship",
+                body: {
+                    npe4__Contact__c: "@{refContact.id}",
+                    npe4__RelatedContact__c: parentId,
+                    npe4__Type__c: "Parent"
+                }
+            }]
+    };
+    console.log(composite);
+    try {
+        const response = yield apiClient.post('/services/data/v58.0/composite', composite);
+        console.log(response);
+        return response.data;
+    }
+    catch (error) {
+        console.error('Adding services request failed:', error);
+        console.error('Response error:', (_a = error.response.data[0]) === null || _a === void 0 ? void 0 : _a.errorCode);
+        throw error;
+    }
+});
+exports.addStudentWithRelationshipToSF = addStudentWithRelationshipToSF;
 const addStudentToSalesforce = (student) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _b, _c;
     try {
         const data = {
             Parent_or_Student__c: 'student',
@@ -81,8 +146,8 @@ const addStudentToSalesforce = (student) => __awaiter(void 0, void 0, void 0, fu
     catch (error) {
         console.error('Creation of Student to salesforce failed:', error);
         if (error.response) {
-            console.error('Response error:', (_a = error.response.data[0]) === null || _a === void 0 ? void 0 : _a.errorCode);
-            throw (_b = error.response.data[0]) === null || _b === void 0 ? void 0 : _b.errorCode;
+            console.error('Response error:', (_b = error.response.data[0]) === null || _b === void 0 ? void 0 : _b.errorCode);
+            throw (_c = error.response.data[0]) === null || _c === void 0 ? void 0 : _c.errorCode;
         }
         else if (error.request) {
             console.error('No response received:', error.request);
@@ -95,7 +160,7 @@ const addStudentToSalesforce = (student) => __awaiter(void 0, void 0, void 0, fu
 });
 exports.addStudentToSalesforce = addStudentToSalesforce;
 const addParentToSalesforce = (parent) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
+    var _d;
     try {
         const data = {
             Parent_or_Student__c: 'parent',
@@ -116,7 +181,7 @@ const addParentToSalesforce = (parent) => __awaiter(void 0, void 0, void 0, func
         // console.error('Creation of parent to salesforce failed:', error)
         if (error.response) {
             // console.error('Response error:', error.response.data[0]?.errorCode)
-            throw (_c = error.response.data[0]) === null || _c === void 0 ? void 0 : _c.errorCode;
+            throw (_d = error.response.data[0]) === null || _d === void 0 ? void 0 : _d.errorCode;
         }
         else if (error.request) {
             // console.error('No response received:', error.request)
@@ -190,13 +255,13 @@ const deleteUser = (id, type) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.deleteUser = deleteUser;
 const deleteRelationship = (id, type) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
+    var _e;
     try {
         const url = type === 'parent'
             ? `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__RelatedContact__c='${id}'+limit 1`
             : `/services/data/v58.0/query?q=SELECT+Id+FROM+npe4__Relationship__c+WHERE+npe4__Contact__c='${id}'+limit 1`;
         const response = yield apiClient.get(url);
-        const records = (_d = response.data) === null || _d === void 0 ? void 0 : _d.records;
+        const records = (_e = response.data) === null || _e === void 0 ? void 0 : _e.records;
         yield Promise.all(records.map((record) => __awaiter(void 0, void 0, void 0, function* () {
             yield apiClient.delete(`/services/data/v58.0/sobjects/npe4__Relationship__c/${record.Id}`);
         })));
@@ -230,72 +295,50 @@ const deleteFromDatabase = () => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.deleteFromDatabase = deleteFromDatabase;
 const syncDatabaseAndSalesforce = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _e;
+    var _f;
     try {
         const salesforceData = yield getDataFromSalesforce();
         console.log("Syncing data...");
-        const salesforcePromise = (_e = salesforceData === null || salesforceData === void 0 ? void 0 : salesforceData.records) === null || _e === void 0 ? void 0 : _e.map((record) => __awaiter(void 0, void 0, void 0, function* () {
+        const salesforcePromise = (_f = salesforceData === null || salesforceData === void 0 ? void 0 : salesforceData.records) === null || _f === void 0 ? void 0 : _f.map((record) => __awaiter(void 0, void 0, void 0, function* () {
             const { Parent_or_Student__c } = record, data = __rest(record, ["Parent_or_Student__c"]);
             const convertedData = {
                 email: data === null || data === void 0 ? void 0 : data.Email,
                 lName: data === null || data === void 0 ? void 0 : data.LastName,
                 fName: data === null || data === void 0 ? void 0 : data.FirstName,
-                phoneNumber: data === null || data === void 0 ? void 0 : data.Phone,
-                birthday: data === null || data === void 0 ? void 0 : data.Birthdate,
-                educationLevel: data === null || data === void 0 ? void 0 : data.Education_Level__c,
-                veteranStatus: data === null || data === void 0 ? void 0 : data.Veteran_Status__c,
-                regularTransportation: data === null || data === void 0 ? void 0 : data.Do_you_have_regular_transportation__c,
-                housingStatus: data === null || data === void 0 ? void 0 : data.Residence_Type__c,
-                grade: data === null || data === void 0 ? void 0 : data.Grade__c,
+                phoneNumber: data === null || data === void 0 ? void 0 : data.HomePhone,
+                birthday: new Date(data === null || data === void 0 ? void 0 : data.Birthdate),
+                educationLevel: mappings_1.educationLevelMapping[data === null || data === void 0 ? void 0 : data.Education_Level__c],
+                veteranStatus: mappings_1.veteranStatusMapping[data === null || data === void 0 ? void 0 : data.Veteran_Status__c],
+                regularTransportation: mappings_1.YesNoBooleanMapping[data === null || data === void 0 ? void 0 : data.Do_you_have_regular_transportation__c],
+                housingStatus: mappings_1.housingStatusMapping[data === null || data === void 0 ? void 0 : data.Residence_Type__c],
+                grade: mappings_1.gradeMapping[data === null || data === void 0 ? void 0 : data.Grade__c],
                 schoolName: data === null || data === void 0 ? void 0 : data.School__c,
-                gender: data === null || data === void 0 ? void 0 : data.Gender__c,
+                gender: mappings_1.genderMapping[data === null || data === void 0 ? void 0 : data.Gender__c],
                 zipCode: data === null || data === void 0 ? void 0 : data.MailingPostalCode,
             };
-            if ((record === null || record === void 0 ? void 0 : record.id) === "003WD000006diLwYAI") {
-                console.log("003WD000006diLwYAI mathced.");
-                try {
-                    const savedData = yield prisma_1.default.parent.update({
-                        where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
-                        data: Object.assign({}, convertedData),
-                    });
-                    console.log(savedData);
-                }
-                catch (error) {
-                    if (error.code === 'P2025') {
-                        console.log(`No record found for salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`);
-                    }
-                    else {
-                        console.error(`Error updating record with salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`, error);
-                    }
-                }
-            }
-            /*
             try {
-              let savedData
-             
-              if (Parent_or_Student__c === 'Parent') {
-                savedData = await prisma.parent.update({
-                  where: { salesforceId: record?.Id },
-                  data: { ...convertedData },
-                });
-              } else if (Parent_or_Student__c === 'Student') {
-                savedData = await prisma.student.update({
-                  where: { salesforceId: record?.Id },
-                  data: { ...convertedData },
-                });
-              }
-      
-              if (savedData) {
-                console.log("Record updated:", savedData);
-              }
-            } catch (error) {
-              if (error.code === 'P2025') {
-                console.log(`No record found for salesforceId: ${record?.Id}`);
-              } else {
-                console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
-              }
+                let savedData;
+                if (Parent_or_Student__c === 'Parent') {
+                    savedData = yield prisma_1.default.parent.update({
+                        where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
+                        data: (0, mappingFilters_1.filterParentData)(convertedData),
+                    });
+                }
+                else if (Parent_or_Student__c === 'Student') {
+                    savedData = yield prisma_1.default.student.update({
+                        where: { salesforceId: record === null || record === void 0 ? void 0 : record.Id },
+                        data: (0, mappingFilters_2.filterStudentData)(convertedData),
+                    });
+                }
             }
-            */
+            catch (error) {
+                if (error.code === 'P2025') {
+                    console.log(`No record found for salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`);
+                }
+                else {
+                    console.error(`Error updating record with salesforceId: ${record === null || record === void 0 ? void 0 : record.Id}`, error);
+                }
+            }
         }));
         yield Promise.all(salesforcePromise);
         return;
@@ -346,10 +389,10 @@ const getDataFromSalesforce = () => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 const getRelationshipsFromSalesforce = () => __awaiter(void 0, void 0, void 0, function* () {
-    var _f;
+    var _g;
     try {
         const response = yield apiClient.get('/services/data/v58.0/query?q=SELECT+npe4__Contact__c,npe4__RelatedContact__c,npe4__Type__c+FROM+npe4__Relationship__c');
-        return (_f = response.data) === null || _f === void 0 ? void 0 : _f.records;
+        return (_g = response.data) === null || _g === void 0 ? void 0 : _g.records;
     }
     catch (error) {
         throw error;
@@ -409,10 +452,10 @@ const getStudentId = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.getStudentId = getStudentId;
 const checkSalesforceForDuplicates = (email, phoneNumber) => __awaiter(void 0, void 0, void 0, function* () {
-    var _g;
+    var _h;
     // try {
     const salesforceData = yield getDataFromSalesforce();
-    const exists = (_g = salesforceData === null || salesforceData === void 0 ? void 0 : salesforceData.records) === null || _g === void 0 ? void 0 : _g.some((record) => (record === null || record === void 0 ? void 0 : record.Email) === email || (record === null || record === void 0 ? void 0 : record.Phone) === phoneNumber);
+    const exists = (_h = salesforceData === null || salesforceData === void 0 ? void 0 : salesforceData.records) === null || _h === void 0 ? void 0 : _h.some((record) => (record === null || record === void 0 ? void 0 : record.Email) === email || (record === null || record === void 0 ? void 0 : record.Phone) === phoneNumber);
     return exists;
     // } catch (error) {
     //   throw error

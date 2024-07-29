@@ -15,14 +15,17 @@ import {
   removeChildFromClass,
   updateParent,
 } from '../services/parents.service'
+
 import {
-  addStudentToSalesforce,
   deleteUser,
   updateParentSalesforce,
+  addStudentWithRelationshipToSF
 } from '../services/salesforce.service'
-import { findStudentById, updateStudent } from '../services/students.service'
+import { deleteStudent, findStudentById, updateStudent } from '../services/students.service'
 import AppError from '../utils/appError'
 import { generateQRCode } from '../utils/qr_generator'
+import { any } from 'zod'
+import { deleteStudentHandler } from './students.controller'
 
 export const getParentsHandler = async (
   req: Request,
@@ -116,14 +119,30 @@ export const addStudentsHandler = async (
     // console.log(checkIfExist)
     // if (!checkIfExist!) {
     const student = await createNewStudent({ ...req.body }, id)
-    const salesforce = await addStudentToSalesforce(req.body)
-    if (typeof salesforce === 'object' && salesforce.id) {
-      await updateStudent(student, { salesforceId: salesforce.id })
+    const salesforce = await addStudentWithRelationshipToSF(req.body, id)
+    //Add rollback if error adding to salesforce & send error code indicating such w/ message
+    if (typeof salesforce === 'object' && salesforce.compositeResponse[0].body.id) {
+      await updateStudent(student, { salesforceId: salesforce.compositeResponse[0].body.id })
+      student.salesforceId = salesforce.compositeResponse[0].body.id;
 
       res.status(201).json({
         status: 'success',
         data: student,
       })
+    }else{
+
+      const errorCodes = salesforce.compositeResponse
+      .map((item:any) => item.body)
+      .flat()
+      .filter((bodyItem:any) => bodyItem.errorCode && bodyItem.errorCode !== "PROCESSING_HALTED")
+      .map((filteredItem:any) => filteredItem.errorCode);
+
+      await deleteStudent(student.id);
+
+      res.status(409).json({
+        status: 'error',
+        message: errorCodes.toString() || "An error occurred adding student to Salesforce.",
+        })
     }
     // } else {
     //   res.status(409).json({
