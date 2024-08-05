@@ -3,6 +3,17 @@
 import { parent, student } from '@prisma/client'
 import axios from 'axios'
 import prisma from '../utils/prisma'
+import {
+    genderMapping,
+    gradeMapping,
+    educationLevelMapping,
+    veteranStatusMapping,
+    housingStatusMapping,
+    YesNoBooleanMapping,
+ } from '../utils/mappings'
+import { filterParentData } from '../utils/mappingFilters';
+import { filterStudentData } from '../utils/mappingFilters';
+
 const tokenUrl = 'https://test.salesforce.com/services/oauth2/token' // Salesforce token endpoint URL (sandbox:test.salesforce.com/services/oauth2/token , org:login.salesforce.com/services/oauth2/token)
 const clientId = process.env.SFCLIENTID //  Salesforce client ID
 const clientSecret = process.env.SFCLIENTSECRET // Salesforce client secret
@@ -44,6 +55,82 @@ apiClient.interceptors.request.use(async (config) => {
   return config
 })
 
+/**
+ * 
+ * @param id id of parent in database
+ * @returns SF id
+ */
+export const getParentSalesforceId = async (id: string) =>{
+  try{
+    const parent = await prisma.parent.findUnique({
+      where: {
+        id: id,
+      },
+    })
+
+    return parent?.salesforceId;
+  }catch(error){
+    console.log('salesforce.service.ts -> getSalesforceId:', error);
+    throw error;
+  }
+}
+
+export const addStudentWithRelationshipToSF = async (student:student, id:string) => {
+  const parentId = await getParentSalesforceId(id);
+  /**
+   * Object for SF composite endpoint. 
+   * allOrNone = true, if any POST method fails they all fail.
+   * referenceId:required,  id of record in SF after POST to be used in subsequent POSTs 
+   */
+  const composite = {
+    allOrNone: true,
+    compositeRequest: [{
+        method: "POST",
+        url: "/services/data/v58.0/sobjects/Contact",
+        referenceId: "refContact",
+        body:{
+          Parent_or_Student__c: 'Student',
+          Email: student.email,
+          LastName: student.lName,
+          FirstName: student.fName,
+          Phone: student.phoneNumber,
+          Birthdate: student.birthday,
+          Grade__c: GradeLevel[student.grade],
+          School__c: student.schoolName,
+          Gender__c: Gender[student.gender],
+          MailingPostalCode: student.zipCode,
+          Emergency_Contact__c: student.emergencyContact,
+        }
+    }, {
+        method: "POST",
+        url: "/services/data/v58.0/sobjects/npe4__Relationship__c",
+        referenceId: "refRelationship",
+        body: {
+            npe4__Contact__c: "@{refContact.id}",
+            npe4__RelatedContact__c: parentId,
+            npe4__Type__c: "Parent"
+        }
+      }]
+    };
+   
+
+  try {
+    const response = await apiClient.post('/services/data/v58.0/composite', composite);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Adding services request failed:', error);
+    console.error('Response error:', error.response.data[0]?.errorCode)
+    throw error;
+  }
+};
+
+/**
+ * Add Student to SF -- Don't use when adding via parent as no relationship in SF 
+ * will be created. Only use for stand alone student account
+ * @param student 
+ * @returns 
+ */
 export const addStudentToSalesforce = async (student: student) => {
   try {
     const data = {
@@ -59,7 +146,7 @@ export const addStudentToSalesforce = async (student: student) => {
       MailingPostalCode: student.zipCode,
       Emergency_Contact__c: student.emergencyContact,
     }
-    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data) // and this is the common endpoint
+    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
     return response.data
   } catch (error: any) {
@@ -201,7 +288,7 @@ const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
     throw error
   }
 }
-
+//Used in cron job to delete records not associated with record in SF
 export const deleteFromDatabase = async () => {
   try {
     const students = await prisma.student.findMany()
@@ -232,58 +319,36 @@ export const syncDatabaseAndSalesforce = async () => {
     console.log("Syncing data...");
     const salesforcePromise = salesforceData?.records?.map(async (record: any) => {
       const { Parent_or_Student__c, ...data } = record
+
       const convertedData = {
         email: data?.Email,
         lName: data?.LastName,
         fName: data?.FirstName,
-        phoneNumber: data?.Phone,
-        birthday: data?.Birthdate,
-        educationLevel: data?.Education_Level__c,
-        veteranStatus: data?.Veteran_Status__c,
-        regularTransportation: data?.Do_you_have_regular_transportation__c,
-        housingStatus: data?.Residence_Type__c,
-        grade: data?.Grade__c,
+        phoneNumber: data?.HomePhone,
+        birthday: new Date(data?.Birthdate),
+        educationLevel: educationLevelMapping[data?.Education_Level__c],
+        veteranStatus: veteranStatusMapping[data?.Veteran_Status__c],
+        regularTransportation: YesNoBooleanMapping[data?.Do_you_have_regular_transportation__c],
+        housingStatus: housingStatusMapping[data?.Residence_Type__c],
+        grade: gradeMapping[data?.Grade__c],
         schoolName: data?.School__c,
-        gender: data?.Gender__c,
+        gender: genderMapping[data?.Gender__c],
         zipCode: data?.MailingPostalCode,
       }
 
-      if(record?.id === "003WD000006diLwYAI"){
-        console.log("003WD000006diLwYAI mathced.")
-        try{
-         const savedData = await prisma.parent.update({
-            where: { salesforceId: record?.Id },
-            data: { ...convertedData },
-          });
-          console.log(savedData);
-
-        }catch(error){
-          if (error.code === 'P2025') {
-            console.log(`No record found for salesforceId: ${record?.Id}`);
-          } else {
-            console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
-          }
-        }
-      }
-
-      /*
       try {
         let savedData
-       
+
         if (Parent_or_Student__c === 'Parent') {
           savedData = await prisma.parent.update({
             where: { salesforceId: record?.Id },
-            data: { ...convertedData },
+            data: filterParentData(convertedData),
           });
         } else if (Parent_or_Student__c === 'Student') {
           savedData = await prisma.student.update({
             where: { salesforceId: record?.Id },
-            data: { ...convertedData },
+            data: filterStudentData(convertedData),
           });
-        }
-
-        if (savedData) {
-          console.log("Record updated:", savedData);
         }
       } catch (error) {
         if (error.code === 'P2025') {
@@ -292,7 +357,7 @@ export const syncDatabaseAndSalesforce = async () => {
           console.error(`Error updating record with salesforceId: ${record?.Id}`, error);
         }
       }
-      */
+
     })
 
     await Promise.all(salesforcePromise)

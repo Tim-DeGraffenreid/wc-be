@@ -5,14 +5,18 @@ import {
     handleParentToChildren,
     syncDatabaseAndSalesforce,
   } from '../services/salesforce.service'
+
 const router = express.Router();
 
-router.route('/synchronize').get( async (  req: Request,
+/**
+ * FixMe: ...run a cron weekly? to clean up any possible parent || students || relationships unreferenced or synced data ??
+ */
+router.route('/sync').get( async (  req: Request,
     res: Response,
     next: NextFunction) => {  
   try {
    // await syncDatabaseAndSalesforce()
-    console.log("Syncronize")
+    console.log("Syncronized")
     res.status(201).json({
         status: 'success',
         message:  'syncDatabaseAndSalesforce successfully executed',

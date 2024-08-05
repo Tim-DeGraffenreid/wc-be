@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const salesforce_service_1 = require("../services/salesforce.service");
 const router = express_1.default.Router();
-router.route('/synchronize').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+/**
+ * FixMe: ...run a cron weekly? to clean up any possible parent || students || relationships unreferenced or synced data ??
+ */
+router.route('/sync').get((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // await syncDatabaseAndSalesforce()
-        console.log("Syncronize");
+        console.log("Syncronized");
         res.status(201).json({
             status: 'success',
             message: 'syncDatabaseAndSalesforce successfully executed',

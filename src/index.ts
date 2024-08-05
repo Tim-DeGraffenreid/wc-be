@@ -44,34 +44,24 @@ connectRedis()
     app.use('/api/admin', adminRouter)
     app.use('/api/events', eventsRouter)
     app.use('/api/crons', cronsRouter )
+
     // CronJobs
-  
     app.get('/api/synchronize', async (  req: Request,
       res: Response,
       next: NextFunction) => {  
     try {
       await syncDatabaseAndSalesforce()
-      console.log("Syncronize")
+
       res.status(201).json({
           status: 'success',
           message:  'syncDatabaseAndSalesforce successfully executed',
         })
-  
+
     } catch (error) {
       console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error)
       next(error)
     }})
 
-    app.get('/api/sync', async (_req: Request, res: Response) => {
-      const message = "sync visited"
-      console.log("message: ", message)
-
-      res.status(200).json({
-        status: 'success',
-        message,
-      })
-    })
-    
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
       const message = await redisClient.get('try')

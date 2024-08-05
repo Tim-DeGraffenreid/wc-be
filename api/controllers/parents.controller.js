@@ -87,27 +87,35 @@ const addStudentsHandler = (req, res, next) => __awaiter(void 0, void 0, void 0,
         return next(new appError_1.default(401, 'Unauthorized'));
     }
     try {
-        // const checkIfExist = await checkSalesforceForDuplicates(
-        //   req?.body?.email,
-        //   req?.body?.phone
-        // )
-        // console.log(checkIfExist)
-        // if (!checkIfExist!) {
+        //Add student to database
         const student = yield (0, parents_service_1.createNewStudent)(Object.assign({}, req.body), id);
-        const salesforce = yield (0, salesforce_service_1.addStudentToSalesforce)(req.body);
-        if (typeof salesforce === 'object' && salesforce.id) {
-            yield (0, students_service_1.updateStudent)(student, { salesforceId: salesforce.id });
+        //add student to SF and create relationship to parent
+        const salesforce = yield (0, salesforce_service_1.addStudentWithRelationshipToSF)(req.body, id);
+        //Check is SF returns an object and there is a SF id associated with student
+        //if successful it will be at index 0 of composite response
+        if (typeof salesforce === 'object' && salesforce.compositeResponse[0].body.id) {
+            yield (0, students_service_1.updateStudent)(student, { salesforceId: salesforce.compositeResponse[0].body.id });
+            student.salesforceId = salesforce.compositeResponse[0].body.id;
             res.status(201).json({
                 status: 'success',
                 data: student,
             });
         }
-        // } else {
-        //   res.status(409).json({
-        //     status: 'error',
-        //     message: 'Student with that email or phone number already exists',
-        //   })
-        // }
+        else {
+            //salesforce rejected adding the student and creating relationship in Sf with parent for 
+            //and reason (all or none)
+            const errorCodes = salesforce.compositeResponse
+                .map((item) => item.body)
+                .flat()
+                .filter((bodyItem) => bodyItem.errorCode && bodyItem.errorCode !== "PROCESSING_HALTED")
+                .map((filteredItem) => filteredItem.errorCode);
+            //Rollback adding student to keep db and SF consistent
+            yield (0, students_service_1.deleteStudent)(student.id);
+            res.status(409).json({
+                status: 'error',
+                message: errorCodes.toString() || "An error occurred adding student to Salesforce.",
+            });
+        }
     }
     catch (error) {
         next(error);
