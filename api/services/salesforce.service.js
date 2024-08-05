@@ -24,7 +24,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkSalesforceForDuplicates = exports.getStudentId = exports.handleParentToChildren = exports.syncDatabaseAndSalesforce = exports.deleteFromDatabase = exports.deleteUser = exports.updateParentSalesforce = exports.updateStudentSalesforce = exports.addParentToSalesforce = exports.addStudentToSalesforce = exports.addStudentWithRelationshipToSF = exports.getSalesforceId = void 0;
+exports.checkSalesforceForDuplicates = exports.getStudentId = exports.handleParentToChildren = exports.syncDatabaseAndSalesforce = exports.deleteFromDatabase = exports.deleteUser = exports.updateParentSalesforce = exports.updateStudentSalesforce = exports.addParentToSalesforce = exports.addStudentToSalesforce = exports.addStudentWithRelationshipToSF = exports.getParentSalesforceId = void 0;
 const axios_1 = __importDefault(require("axios"));
 const prisma_1 = __importDefault(require("../utils/prisma"));
 const mappings_1 = require("../utils/mappings");
@@ -62,7 +62,12 @@ apiClient.interceptors.request.use((config) => __awaiter(void 0, void 0, void 0,
     config.headers['X-Authorization-Date'] = new Date().toUTCString();
     return config;
 }));
-const getSalesforceId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+/**
+ *
+ * @param id id of parent in database
+ * @returns SF id
+ */
+const getParentSalesforceId = (id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const parent = yield prisma_1.default.parent.findUnique({
             where: {
@@ -76,11 +81,15 @@ const getSalesforceId = (id) => __awaiter(void 0, void 0, void 0, function* () {
         throw error;
     }
 });
-exports.getSalesforceId = getSalesforceId;
+exports.getParentSalesforceId = getParentSalesforceId;
 const addStudentWithRelationshipToSF = (student, id) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const parentId = yield (0, exports.getSalesforceId)(id);
-    console.log("parentId" + id + ": ", parentId);
+    const parentId = yield (0, exports.getParentSalesforceId)(id);
+    /**
+     * Object for SF composite endpoint.
+     * allOrNone = true, if any POST method fails they all fail.
+     * referenceId:required,  id of record in SF after POST to be used in subsequent POSTs
+     */
     const composite = {
         allOrNone: true,
         compositeRequest: [{
@@ -111,10 +120,8 @@ const addStudentWithRelationshipToSF = (student, id) => __awaiter(void 0, void 0
                 }
             }]
     };
-    console.log(composite);
     try {
         const response = yield apiClient.post('/services/data/v58.0/composite', composite);
-        console.log(response);
         return response.data;
     }
     catch (error) {
@@ -124,6 +131,12 @@ const addStudentWithRelationshipToSF = (student, id) => __awaiter(void 0, void 0
     }
 });
 exports.addStudentWithRelationshipToSF = addStudentWithRelationshipToSF;
+/**
+ * Add Student to SF -- Don't use when adding via parent as no relationship in SF
+ * will be created. Only use for stand alone student account
+ * @param student
+ * @returns
+ */
 const addStudentToSalesforce = (student) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
     try {
@@ -140,7 +153,7 @@ const addStudentToSalesforce = (student) => __awaiter(void 0, void 0, void 0, fu
             MailingPostalCode: student.zipCode,
             Emergency_Contact__c: student.emergencyContact,
         };
-        const response = yield apiClient.post('/services/data/v52.0/sobjects/Contact', data); // and this is the common endpoint
+        const response = yield apiClient.post('/services/data/v52.0/sobjects/Contact', data);
         return response.data;
     }
     catch (error) {
@@ -272,6 +285,7 @@ const deleteRelationship = (id, type) => __awaiter(void 0, void 0, void 0, funct
         throw error;
     }
 });
+//Used in cron job to delete records not associated with record in SF
 const deleteFromDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const students = yield prisma_1.default.student.findMany();

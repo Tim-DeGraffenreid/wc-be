@@ -5,15 +5,5 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.js" }
-  ],
-  "crons": [
-    {
-      "path": "/api/crons/syncronize",
-      "schedule": "30 14 * * *"
-    },
-    {
-      "path": "/api/crons/relationships",
-      "schedule": "30 14 * * *"
-    }
   ]
 }

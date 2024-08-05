@@ -55,7 +55,12 @@ apiClient.interceptors.request.use(async (config) => {
   return config
 })
 
-export const getSalesforceId = async (id: string) =>{
+/**
+ * 
+ * @param id id of parent in database
+ * @returns SF id
+ */
+export const getParentSalesforceId = async (id: string) =>{
   try{
     const parent = await prisma.parent.findUnique({
       where: {
@@ -71,8 +76,12 @@ export const getSalesforceId = async (id: string) =>{
 }
 
 export const addStudentWithRelationshipToSF = async (student:student, id:string) => {
-  const parentId = await getSalesforceId(id);
-  console.log("parentId" + id + ": ", parentId);
+  const parentId = await getParentSalesforceId(id);
+  /**
+   * Object for SF composite endpoint. 
+   * allOrNone = true, if any POST method fails they all fail.
+   * referenceId:required,  id of record in SF after POST to be used in subsequent POSTs 
+   */
   const composite = {
     allOrNone: true,
     compositeRequest: [{
@@ -103,11 +112,11 @@ export const addStudentWithRelationshipToSF = async (student:student, id:string)
         }
       }]
     };
-    console.log(composite);
+   
 
   try {
     const response = await apiClient.post('/services/data/v58.0/composite', composite);
-    console.log(response);
+    
     return response.data;
   } catch (error) {
     console.error('Adding services request failed:', error);
@@ -116,6 +125,12 @@ export const addStudentWithRelationshipToSF = async (student:student, id:string)
   }
 };
 
+/**
+ * Add Student to SF -- Don't use when adding via parent as no relationship in SF 
+ * will be created. Only use for stand alone student account
+ * @param student 
+ * @returns 
+ */
 export const addStudentToSalesforce = async (student: student) => {
   try {
     const data = {
@@ -131,7 +146,7 @@ export const addStudentToSalesforce = async (student: student) => {
       MailingPostalCode: student.zipCode,
       Emergency_Contact__c: student.emergencyContact,
     }
-    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data) // and this is the common endpoint
+    const response = await apiClient.post('/services/data/v52.0/sobjects/Contact', data)
 
     return response.data
   } catch (error: any) {
@@ -273,7 +288,7 @@ const deleteRelationship = async (id: string, type: 'parent' | 'student') => {
     throw error
   }
 }
-
+//Used in cron job to delete records not associated with record in SF
 export const deleteFromDatabase = async () => {
   try {
     const students = await prisma.student.findMany()

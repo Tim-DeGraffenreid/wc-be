@@ -69,7 +69,6 @@ const port = process.env.PORT || 3000;
     app.get('/api/synchronize', (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         try {
             yield (0, salesforce_service_1.syncDatabaseAndSalesforce)();
-            console.log("Syncronize");
             res.status(201).json({
                 status: 'success',
                 message: 'syncDatabaseAndSalesforce successfully executed',
@@ -79,14 +78,6 @@ const port = process.env.PORT || 3000;
             console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error);
             next(error);
         }
-    }));
-    app.get('/api/sync', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
-        const message = "sync visited";
-        console.log("message: ", message);
-        res.status(200).json({
-            status: 'success',
-            message,
-        });
     }));
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', (_req, res) => __awaiter(void 0, void 0, void 0, function* () {
