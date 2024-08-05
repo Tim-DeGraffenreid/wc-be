@@ -1,3 +1,4 @@
+
 import 'dotenv/config'
 import express, {
   Express,
@@ -24,12 +25,12 @@ import {
   handleParentToChildren,
   syncDatabaseAndSalesforce,
 } from './services/salesforce.service'
+import cronsRouter from './routes/crons.route'
+const app: Express = express()
+const port = process.env.PORT || 3000
 
 connectRedis()
   .then(async () => {
-    const app: Express = express()
-    const port = process.env.PORT || 5000
-
     app.use(cors())
     app.use(json())
     app.use(urlencoded({ extended: false }))
@@ -42,31 +43,24 @@ connectRedis()
     app.use('/api/students', studentRouter)
     app.use('/api/admin', adminRouter)
     app.use('/api/events', eventsRouter)
+    app.use('/api/crons', cronsRouter )
 
     // CronJobs
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await syncDatabaseAndSalesforce()
-      } catch (error) {
-        console.error('Error during scheduled synchronization:', error)
-      }
-    })
+    app.get('/api/synchronize', async (  req: Request,
+      res: Response,
+      next: NextFunction) => {  
+    try {
+      await syncDatabaseAndSalesforce()
 
-    cron.schedule('*/1 * * * *', async () => {
-      try {
-        await handleParentToChildren()
-      } catch (error) {
-        console.error('Error during scheduled relationship update:', error)
-      }
-    })
+      res.status(201).json({
+          status: 'success',
+          message:  'syncDatabaseAndSalesforce successfully executed',
+        })
 
-    cron.schedule('*/2 * * * *', async () => {
-      try {
-        await deleteFromDatabase()
-      } catch (error) {
-        console.error('Error during schedule database deletion:', error)
-      }
-    })
+    } catch (error) {
+      console.error('syncDatabaseAndSalesforce error during scheduled synchronization:', error)
+      next(error)
+    }})
 
     // Health checker: to check if server is successfully running
     app.get('/api/healthChecker', async (_req: Request, res: Response) => {
@@ -97,5 +91,10 @@ connectRedis()
     app.listen(port, () => {
       console.log(`⚡[server]: Server started successfully on PORT: ${port}`)
     })
+
   })
   .catch((err: any) => console.log(err))
+
+export default app;
+
+

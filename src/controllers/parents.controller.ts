@@ -15,14 +15,17 @@ import {
   removeChildFromClass,
   updateParent,
 } from '../services/parents.service'
+
 import {
-  addStudentToSalesforce,
   deleteUser,
   updateParentSalesforce,
+  addStudentWithRelationshipToSF
 } from '../services/salesforce.service'
-import { findStudentById, updateStudent } from '../services/students.service'
+import { deleteStudent, findStudentById, updateStudent } from '../services/students.service'
 import AppError from '../utils/appError'
 import { generateQRCode } from '../utils/qr_generator'
+import { any } from 'zod'
+import { deleteStudentHandler } from './students.controller'
 
 export const getParentsHandler = async (
   req: Request,
@@ -108,29 +111,36 @@ export const addStudentsHandler = async (
   }
 
   try {
-    // const checkIfExist = await checkSalesforceForDuplicates(
-    //   req?.body?.email,
-    //   req?.body?.phone
-    // )
-
-    // console.log(checkIfExist)
-    // if (!checkIfExist!) {
+    //Add student to database
     const student = await createNewStudent({ ...req.body }, id)
-    const salesforce = await addStudentToSalesforce(req.body)
-    if (typeof salesforce === 'object' && salesforce.id) {
-      await updateStudent(student, { salesforceId: salesforce.id })
+    //add student to SF and create relationship to parent
+    const salesforce = await addStudentWithRelationshipToSF(req.body, id)
+    //Check is SF returns an object and there is a SF id associated with student
+    //if successful it will be at index 0 of composite response
+    if (typeof salesforce === 'object' && salesforce.compositeResponse[0].body.id) {
+      await updateStudent(student, { salesforceId: salesforce.compositeResponse[0].body.id })
+      student.salesforceId = salesforce.compositeResponse[0].body.id;
 
       res.status(201).json({
         status: 'success',
         data: student,
       })
+    }else{
+      //salesforce rejected adding the student and creating relationship in Sf with parent for 
+      //and reason (all or none)
+      const errorCodes = salesforce.compositeResponse
+        .map((item:any) => item.body)
+        .flat()
+        .filter((bodyItem:any) => bodyItem.errorCode && bodyItem.errorCode !== "PROCESSING_HALTED")
+        .map((filteredItem:any) => filteredItem.errorCode);
+      //Rollback adding student to keep db and SF consistent
+      await deleteStudent(student.id);
+
+      res.status(409).json({
+        status: 'error',
+        message: errorCodes.toString() || "An error occurred adding student to Salesforce.",
+        })
     }
-    // } else {
-    //   res.status(409).json({
-    //     status: 'error',
-    //     message: 'Student with that email or phone number already exists',
-    //   })
-    // }
   } catch (error: any) {
     next(error)
   }
